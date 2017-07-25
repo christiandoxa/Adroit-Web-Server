@@ -1,7 +1,12 @@
 <?php
 
-class GenerateToken
+class GenerateToken extends CI_Model
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     function rand_alphnum($min, $max)
     {
         $range = $max - $min;
@@ -22,6 +27,7 @@ class GenerateToken
         $randnumb = "";
         $randnumb2 = "";
         $codeAlphabet = "abcdefghijklmnopqrstuvwxyz";
+        $codeAlphabet .= "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         $codeAlphabet .= "0123456789";
         $max = strlen($codeAlphabet);
 
@@ -33,7 +39,7 @@ class GenerateToken
             $randnumb2 .= $codeAlphabet[$this->rand_alphnum(0, $max - 1)];
         }
 
-        $hash = $randnumb2 . "?" . hash("sha256", $password . $username, false) . "!" . $randnumb;
+        $hash = base64_encode($randnumb2 . "?" . base64_encode($username . $password) . "!" . $randnumb);
         return $hash;
     }
 }
