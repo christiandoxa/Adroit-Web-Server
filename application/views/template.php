@@ -69,7 +69,7 @@
                     </li>
                     <li class="divider"></li>
                     <li><a href="<?php echo base_url('dashboard/logout') ?>"><i class="fa fa-sign-out fa-fw"></i>
-                            Keluarrr</a>
+                            Keluar</a>
                     </li>
                 </ul>
                 <!-- /.dropdown-user -->
@@ -82,14 +82,15 @@
             <div class="sidebar-nav navbar-collapse">
                 <ul class="nav" id="side-menu">
                     <li>
-                        <a href="#"><i class="fa fa-wrench fa-fw"></i> Admin<span class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level">
-                            <li>
-                                <a href="<?php echo base_url('dashboard/tambah_pengguna') ?>"><i
-                                            class="fa fa-user-plus fa-fw"></i> Pengguna</a>
-                            </li>
-                        </ul>
-                        <!-- /.nav-second-level -->
+                        <a href="<?php echo base_url() ?>"><i class="fa fa-home fa-fw"></i> Beranda</a>
+                    </li>
+                    <li>
+                        <a href="<?php echo base_url('dashboard/tambah_pengguna') ?>"><i
+                                    class="fa fa-user-plus fa-fw"></i> Pengguna</a>
+                    </li>
+                    <li>
+                        <a href="<?php echo base_url('dashboard/daftar_pengguna') ?>"><i
+                                    class="fa fa-table fa-fw"></i> Daftar Pengguna</a>
                     </li>
                 </ul>
             </div>
@@ -150,8 +151,8 @@
 <script>
     $(document).ready(function () {
         $('#dataTables-example').DataTable({
-            "aoColumnDefs": [{"bSortable": false, "aTargets": [4, 5]},
-                {"bSearchable": false, "aTargets": [4, 5]}],
+            "aoColumnDefs": [{"bSortable": false, "aTargets": [2, 3]},
+                {"bSearchable": false, "aTargets": [2, 3]}],
             responsive: true
         });
     });
