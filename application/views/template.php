@@ -54,7 +54,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="<?php echo base_url() ?>">Adroit Web Server</a>
+            <a class="navbar-brand" href="<?php echo base_url('dashboard') ?>">Adroit Web Server</a>
         </div>
         <!-- /.navbar-header -->
 
@@ -65,9 +65,6 @@
                     <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-user">
-                    <li><a href="#"><i class="fa fa-user fa-fw"></i> Profil Anda</a>
-                    </li>
-                    <li class="divider"></li>
                     <li><a href="<?php echo base_url('dashboard/logout') ?>"><i class="fa fa-sign-out fa-fw"></i>
                             Keluar</a>
                     </li>
@@ -82,15 +79,23 @@
             <div class="sidebar-nav navbar-collapse">
                 <ul class="nav" id="side-menu">
                     <li>
-                        <a href="<?php echo base_url() ?>"><i class="fa fa-home fa-fw"></i> Beranda</a>
+                        <a href="<?php echo base_url('dashboard') ?>"><i class="fa fa-home fa-fw"></i> Beranda</a>
                     </li>
                     <li>
                         <a href="<?php echo base_url('dashboard/tambah_pengguna') ?>"><i
                                     class="fa fa-user-plus fa-fw"></i> Pengguna</a>
                     </li>
                     <li>
+                        <a href="<?php echo base_url('dashboard/tambah_perangkat') ?>"><i
+                                    class="fa fa-mobile-phone fa-fw"></i> Perangkat</a>
+                    </li>
+                    <li>
                         <a href="<?php echo base_url('dashboard/daftar_pengguna') ?>"><i
-                                    class="fa fa-table fa-fw"></i> Daftar Pengguna</a>
+                                    class="fa fa-user fa-fw"></i> Daftar Pengguna</a>
+                    </li>
+                    <li>
+                        <a href="<?php echo base_url('dashboard/daftar_perangkat') ?>"><i
+                                    class="fa fa-cloud fa-fw"></i> Daftar Perangkat</a>
                     </li>
                 </ul>
             </div>
@@ -151,8 +156,24 @@
 <script>
     $(document).ready(function () {
         $('#dataTables-example').DataTable({
-            "aoColumnDefs": [{"bSortable": false, "aTargets": [2, 3]},
-                {"bSearchable": false, "aTargets": [2, 3]}],
+            "aoColumnDefs": [{"bSortable": false, "aTargets": [3]},
+                {"bSearchable": false, "aTargets": [3]}],
+            responsive: true
+        });
+    });
+
+    $(document).ready(function () {
+        $('#dataTables-device').DataTable({
+            "aoColumnDefs": [{"bSortable": false, "aTargets": [1]},
+                {"bSearchable": false, "aTargets": [1]}],
+            responsive: true
+        });
+    });
+
+    $(document).ready(function () {
+        $('#dataTables-2').DataTable({
+            "aoColumnDefs": [{"bSortable": false, "aTargets": [2]},
+                {"bSearchable": false, "aTargets": [2]}],
             responsive: true
         });
     });

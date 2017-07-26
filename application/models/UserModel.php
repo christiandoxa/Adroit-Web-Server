@@ -29,6 +29,7 @@ class UserModel extends CI_Model {
 
     public function update($table, $column, $item, $data) {
         $this->db->where($column, $item)->update($table, $data);
+
         if ($this->db->affected_rows() > 0) {
             return true;
         } else {
@@ -38,5 +39,33 @@ class UserModel extends CI_Model {
 
     public function getWhere($table, $column, $item) {
         return $this->db->where($column, $item)->get($table)->row();
+    }
+
+    public function login() {
+        $username = $this->input->post('username');
+        $password = $this->input->post('password');
+
+        $query = $this->db->where('username', $username)
+            ->where('password', sha1($password))
+            ->get('admin');
+
+        if ($query->num_rows() > 0) {
+            $data = array(
+                'logged_in' => true,
+                'username' => $username
+            );
+            $this->session->set_userdata($data);
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
+
+    public function count($table) {
+        return $this->db->count_all($table);
+    }
+
+    public function query($sql) {
+        return $query = $this->db->query($sql)->result();
     }
 }

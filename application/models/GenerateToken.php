@@ -27,11 +27,11 @@ class GenerateToken extends CI_Model {
         $codeAlphabet .= "0123456789";
         $max = strlen($codeAlphabet);
 
-        for ($i = 0; $i < rand(12, 32); $i++) {
+        for ($i = 0; $i < rand(5, 6); $i++) {
             $randnumb .= $codeAlphabet[$this->rand_alphnum(0, $max - 1)];
         }
 
-        for ($i = 0; $i < rand(3, 7); $i++) {
+        for ($i = 0; $i < rand(1, 3); $i++) {
             $randnumb2 .= $codeAlphabet[$this->rand_alphnum(0, $max - 1)];
         }
 
