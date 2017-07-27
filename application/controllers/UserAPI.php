@@ -9,6 +9,9 @@ class UserAPI extends REST_Controller
         $this->load->model('GenerateToken');
     }
 
+    const SUCCESS = 'success';
+    const FAIL = 'fail';
+
     public function index_get()
     {
         $key = $this->uri->segment(4);
@@ -20,7 +23,7 @@ class UserAPI extends REST_Controller
             $this->db->where($key, $id);
             $data = $this->db->get($table)->result();
         }
-        $this->response(array('status' => 'success', 'data' => $data), 200);
+        $this->response(array('status' => self::SUCCESS, 'data' => $data), 200);
     }
 
     public function login_post()
@@ -36,12 +39,12 @@ class UserAPI extends REST_Controller
             );
             $query_update = $this->db->where('email', $email)->where('kata_sandi', $password)->update('akun', $data);
             if ($query_update) {
-                $this->response(array('status' => 'success', 'token' => $token), 200);
+                $this->response(array('status' => self::SUCCESS, 'token' => $token), 200);
             } else {
-                $this->response(array('status' => 'fail'), 500);
+                $this->response(array('status' => self::FAIL), 500);
             }
         } else {
-            $this->response(array('status' => 'fail'), 500);
+            $this->response(array('status' => self::FAIL), 500);
         }
     }
 
@@ -95,13 +98,13 @@ class UserAPI extends REST_Controller
         curl_close($curl_response);
         $decoded = json_decode($curl_response);
         if (isset($decoded->response->status) && $decoded->response->status == 'ERROR') {
-            $this->response(array('status' => 'fail'), 500);
+            $this->response(array('status' => self::FAIL), 500);
         } else {
             $update = $this->db->where('device_id', $id)->update('device', $data);
             if ($update) {
-                $this->response(array('status' => 'Success'), 200);
+                $this->response(array('status' => self::SUCCESS), 200);
             } else {
-                $this->response(array('status' => 'fail'), 502);
+                $this->response(array('status' => self::FAIL), 502);
             }
         }
     }
@@ -115,9 +118,9 @@ class UserAPI extends REST_Controller
         $this->db->where($key, $id);
         $delete = $this->db->delete($table);
         if ($delete) {
-            $this->response(array('status' => 'success'), 201);
+            $this->response(array('status' => self::SUCCESS), 201);
         } else {
-            $this->response(array('status' => 'fail'), 502);
+            $this->response(array('status' => self::FAIL), 502);
         }
     }
 }
