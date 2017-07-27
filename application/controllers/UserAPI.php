@@ -14,34 +14,57 @@ class UserAPI extends REST_Controller
 
     public function index_get()
     {
-        $key = $this->uri->segment(4);
-        $table = $this->uri->segment(2);
-        $id = $this->uri->segment(3);
-        if ($id == '' || $key == '') {
-            $data = $this->db->get($table)->result();
+        $key = 'device_id';
+        $table = 'device';
+        $id = $this->uri->segment(2, 0);
+        if ($id == '0') {
+            $this->response(array('status' => self::FAIL), 400);
         } else {
-            $this->db->where($key, $id);
-            $data = $this->db->get($table)->result();
+            $data = $this->db->where($key, $id)->get($table);
+            if ($data->num_rows() > 0) {
+                $this->response(array('status' => self::SUCCESS, 'data' => $data->row()), 200);
+            } else {
+                $this->response(array('status' => 'not found'), 400);
+            }
         }
-        $this->response(array('status' => self::SUCCESS, 'data' => $data), 200);
+    }
+
+    public function profile_get()
+    {
+        $headers = apache_request_headers();
+        $token = $headers['KEY'];
+        $data = $this->db->where('token', $token)->get('akun');
+        if ($data->num_rows() > 0) {
+            $profile = $data->row();
+            $email = $profile->email;
+            $device = $this->db->where('email', $email)->get('device');
+            if ($device->num_rows() > 0) {
+                $device_list = $device->result();
+                $this->response(array('profile' => $profile, 'device' => $device_list), 200);
+            } else {
+                $this->response(array('profile' => $profile, 'device' => 'not found'), 200);
+            }
+        } else {
+            $this->response(array('status' => 'not found'), 400);
+        }
     }
 
     public function login_post()
     {
         $email = $this->post('email');
-        $password = $this->post('password');
+        $password = base64_decode($this->post('password'));
 
-        $query = $this->db->where('email', $email)->where('kata_sandi', $password)->get('akun');
+        $query = $this->db->where('email', $email)->where('kata_sandi', sha1($password))->get('akun');
         if ($query->num_rows() > 0) {
             $token = $this->GenerateToken->getHash($email, $password);
             $data = array(
                 'token' => $token
             );
-            $query_update = $this->db->where('email', $email)->where('kata_sandi', $password)->update('akun', $data);
+            $query_update = $this->db->where('email', $email)->where('kata_sandi', sha1($password))->update('akun', $data);
             if ($query_update) {
                 $this->response(array('status' => self::SUCCESS, 'token' => $token), 200);
             } else {
-                $this->response(array('status' => self::FAIL), 500);
+                $this->response(array('status' => self::FAIL), 502);
             }
         } else {
             $this->response(array('status' => self::FAIL), 500);
