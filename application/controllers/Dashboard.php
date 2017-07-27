@@ -353,29 +353,24 @@ class Dashboard extends CI_Controller {
     }
 
     public function login() {
-        if ($this->session->userdata('logged_in') == true) {
-            if ($this->input->post('submit')) {
-                $this->form_validation->set_rules('username', 'Username', 'trim|required');
-                $this->form_validation->set_rules('password', 'Password', 'trim|required');
-                if ($this->form_validation->run() == TRUE) {
-                    if ($this->UserModel->login() == TRUE)
-                        if ($_SERVER['HTTP_REFERER'] == base_url()) {
-                            redirect(base_url('dashboard'));
-                        } else {
-                            redirect($_SERVER['HTTP_REFERER']);
-                        }
-                    else {
-                        $data['notif'] = 'Login gagal';
-                        $this->load->view('login', $data);
+        if ($this->input->post('submit')) {
+            $this->form_validation->set_rules('username', 'Username', 'trim|required');
+            $this->form_validation->set_rules('password', 'Password', 'trim|required');
+            if ($this->form_validation->run() == TRUE) {
+                if ($this->UserModel->login() == TRUE)
+                    if ($_SERVER['HTTP_REFERER'] == base_url()) {
+                        redirect(base_url('dashboard'));
+                    } else {
+                        redirect($_SERVER['HTTP_REFERER']);
                     }
-                } else {
+                else {
                     $data['notif'] = 'Login gagal';
                     $this->load->view('login', $data);
                 }
+            } else {
+                $data['notif'] = 'Login gagal';
+                $this->load->view('login', $data);
             }
-        } else {
-            $data['notif'] = "Silahkan login terlebih dahulu.";
-            $this->load->view('login', $data);
         }
     }
 
