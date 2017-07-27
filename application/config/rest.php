@@ -363,7 +363,7 @@ $config['rest_limits_method'] = 'ROUTED_URL';
 | Note: The maximum length is 40
 |
 */
-$config['rest_key_length'] = 100;
+$config['rest_key_length'] = 767;
 
 /*
 |--------------------------------------------------------------------------

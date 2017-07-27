@@ -23,7 +23,7 @@ class GenerateToken extends CI_Model
             $randnumb2 .= $codeAlphabet[$this->rand_alphnum(0, $max - 1)];
         }
 
-        $hash = base64_encode($randnumb2 . ")" . base64_encode($email . $password) . "!" . $randnumb);
+        $hash = base64_encode($randnumb2 . ")" . base64_encode(base64_encode(base64_encode($email) . '$' . base64_encode($password))) . "!" . $randnumb);
         return $hash;
     }
 
