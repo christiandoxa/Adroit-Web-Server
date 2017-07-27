@@ -8,7 +8,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | This file will contain the settings needed to access your database.
 |
 | For complete instructions please consult the 'Database Connection'
-| page of the User Guide.
+| page of the UserAPI Guide.
 |
 | -------------------------------------------------------------------
 | EXPLANATION OF VARIABLES
@@ -76,9 +76,9 @@ $query_builder = TRUE;
 $db['default'] = array(
     'dsn' => '',
     'hostname' => 'localhost',
-    'username' => '',
+    'username' => 'root',
     'password' => '',
-    'database' => '',
+    'database' => 'db_adroit',
     'dbdriver' => 'mysqli',
     'dbprefix' => '',
     'pconnect' => FALSE,

@@ -478,7 +478,7 @@ class CI_Output {
                     header('Content-Encoding: gzip');
                     header('Content-Length: ' . self::strlen($output));
                 } else {
-                    // User agent doesn't support gzip compression,
+                    // UserAPI agent doesn't support gzip compression,
                     // so we'll have to decompress our cache
                     $output = gzinflate(self::substr($output, 10, -8));
                 }

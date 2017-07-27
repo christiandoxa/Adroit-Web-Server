@@ -57,7 +57,7 @@ class CI_Email {
      */
     protected static $func_overload;
     /**
-     * Used as the User-Agent and X-Mailer headers' value.
+     * Used as the UserAPI-Agent and X-Mailer headers' value.
      *
      * @var    string
      */
@@ -1079,7 +1079,7 @@ class CI_Email {
      * @return    void
      */
     protected function _build_headers() {
-        $this->set_header('User-Agent', $this->useragent);
+        $this->set_header('UserAPI-Agent', $this->useragent);
         $this->set_header('X-Sender', $this->clean_email($this->_headers['From']));
         $this->set_header('X-Mailer', $this->useragent);
         $this->set_header('X-Priority', $this->_priorities[$this->priority]);

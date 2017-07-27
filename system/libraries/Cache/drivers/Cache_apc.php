@@ -166,7 +166,7 @@ class CI_Cache_apc extends CI_Driver {
      * @return    bool    false on failure/true on success
      */
     public function clean() {
-        return apc_clear_cache('user');
+        return apc_clear_cache('UserAPI');
     }
 
     // ------------------------------------------------------------------------
@@ -174,7 +174,7 @@ class CI_Cache_apc extends CI_Driver {
     /**
      * Cache Info
      *
-     * @param    string    user/filehits
+     * @param    string    UserAPI/filehits
      * @return    mixed    array on success, false on failure
      */
     public function cache_info($type = NULL) {
