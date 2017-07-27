@@ -84,7 +84,7 @@ class UserAPI extends REST_Controller
                 break;
             case "jemur":
                 $data = array(
-                    'servo' => 'Angkat'
+                    'servo' => 'Jemur'
                 );
                 $stat = 0;
                 break;
