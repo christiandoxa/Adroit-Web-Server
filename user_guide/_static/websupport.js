@@ -350,7 +350,7 @@
                     });
                     return;
                 }
-                // User mode: only mark the comment as deleted
+                // UserAPI mode: only mark the comment as deleted
                 div
                     .find('span.user-id:first')
                     .text('[deleted]').end()
