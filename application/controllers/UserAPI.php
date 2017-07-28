@@ -17,7 +17,7 @@ class UserAPI extends REST_Controller
         $key = 'device_id';
         $table = 'device';
         $id = $this->uri->segment(2, 0);
-        if ($id == '0') {
+        if ($id === 0) {
             $this->response(array('status' => self::FAIL), 400);
         } else {
             $data = $this->db->where($key, $id)->get($table);
@@ -26,6 +26,19 @@ class UserAPI extends REST_Controller
             } else {
                 $this->response(array('status' => 'not found'), 400);
             }
+        }
+    }
+
+    public function login_get()
+    {
+        $headers = apache_request_headers();
+        $token = $headers['KEY'];
+
+        $query = $this->db->where('token', $token)->get('akun');
+        if ($query->num_rows() > 0) {
+            $this->response(array('status' => self::SUCCESS, 'token' => $token), 200);
+        } else {
+            $this->response(array('status' => self::FAIL), 500);
         }
     }
 
@@ -46,28 +59,6 @@ class UserAPI extends REST_Controller
             }
         } else {
             $this->response(array('status' => 'not found'), 400);
-        }
-    }
-
-    public function login_post()
-    {
-        $email = $this->post('email');
-        $password = base64_decode($this->post('password'));
-
-        $query = $this->db->where('email', $email)->where('kata_sandi', sha1($password))->get('akun');
-        if ($query->num_rows() > 0) {
-            $token = $this->GenerateToken->getHash($email, $password);
-            $data = array(
-                'token' => $token
-            );
-            $query_update = $this->db->where('email', $email)->where('kata_sandi', sha1($password))->update('akun', $data);
-            if ($query_update) {
-                $this->response(array('status' => self::SUCCESS, 'token' => $token), 200);
-            } else {
-                $this->response(array('status' => self::FAIL), 502);
-            }
-        } else {
-            $this->response(array('status' => self::FAIL), 500);
         }
     }
 
@@ -101,13 +92,19 @@ class UserAPI extends REST_Controller
                 $stat = 0;
                 break;
         }
-        $url = 'http://api.arkademy.com:3000/v0/arkana/device/IO/' . $id . '/gpio/control';
+        /*$url = 'http://api.arkademy.com:3000/v0/arkana/device/IO/' . $id . '/gpio/control';
         $data_post = array(
             "control" => array(
                 "13" => $stat
             )
-        );
-        $curl = curl_init($url);
+        );*/
+        $update = $this->db->where('device_id', $id)->update('device', $data);
+        if ($update) {
+            $this->response(array('status' => self::SUCCESS), 200);
+        } else {
+            $this->response(array('status' => self::FAIL), 502);
+        }
+        /*$curl = curl_init($url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data_post);
@@ -129,7 +126,7 @@ class UserAPI extends REST_Controller
             } else {
                 $this->response(array('status' => self::FAIL), 502);
             }
-        }
+        }*/
     }
 
 
