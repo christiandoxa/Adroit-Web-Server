@@ -1,7 +1,7 @@
 <?php
 require APPPATH . './libraries/REST_Controller.php';
 
-class Login extends CI_Controller
+class LoginAwal extends CI_Controller
 {
     const SUCCESS = 'success';
     const FAIL = 'fail';
