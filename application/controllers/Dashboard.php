@@ -358,7 +358,7 @@ class Dashboard extends CI_Controller {
             $this->form_validation->set_rules('password', 'Password', 'trim|required');
             if ($this->form_validation->run() == TRUE) {
                 if ($this->UserModel->login() == TRUE)
-                    if ($_SERVER['HTTP_REFERER'] == base_url()) {
+                    if ($_SERVER['HTTP_REFERER'] == base_url('login')) {
                         redirect(base_url('dashboard'));
                     } else {
                         redirect($_SERVER['HTTP_REFERER']);
@@ -380,7 +380,7 @@ class Dashboard extends CI_Controller {
                 'logged_in' => ''
             );
             $this->session->sess_destroy();
-            redirect(base_url());
+            redirect(base_url('login'));
         } else {
             $data['notif'] = "Silahkan login terlebih dahulu.";
             $this->load->view('login', $data);
