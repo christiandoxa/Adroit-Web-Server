@@ -41,6 +41,17 @@ class UserModel extends CI_Model {
         return $this->db->where($column, $item)->get($table)->row();
     }
 
+    public function cekSubscriber() {
+        $email = $this->input->post('email');
+        $query = $this->db->where('email', $email)
+            ->get('subscriber');
+        if ($query->num_rows() > 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     public function login() {
         $username = $this->input->post('username');
         $password = $this->input->post('password');
