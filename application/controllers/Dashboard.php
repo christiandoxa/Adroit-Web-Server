@@ -15,6 +15,7 @@ class Dashboard extends CI_Controller {
             $data['main_view'] = 'utama';
             $data['pengguna'] = $this->UserModel->count('akun');
             $data['perangkat'] = $this->UserModel->count('device');
+            $data['pesan'] = $this->UserModel->count('pesan');
             $this->load->view('template', $data);
         } else {
             $data['notif'] = "Silahkan login terlebih dahulu.";
@@ -62,6 +63,19 @@ class Dashboard extends CI_Controller {
         }
     }
 
+    public function detail_pesan() {
+        if ($this->session->userdata('logged_in') == true) {
+            $email = $this->input->get('email');
+            $data['judul'] = 'Detail Pesan';
+            $data['main_view'] = 'detail_pesan';
+            $data['detail'] = $this->UserModel->getWhere('pesan', 'email', $email);
+            $this->load->view('template', $data);
+        } else {
+            $data['notif'] = 'Silahkan login terlebih dahulu.';
+            $this->load->view('login', $data);
+        }
+    }
+
     public function detail_perangkat() {
         if ($this->session->userdata('logged_in') == true) {
             $device_id = $this->input->get('deviceid');
@@ -94,6 +108,18 @@ class Dashboard extends CI_Controller {
             $data['main_view'] = 'daftar_perangkat';
             $data['perangkat'] = $this->UserModel
                 ->query('SELECT nama, email, device_id FROM akun NATURAL JOIN device;');
+            $this->load->view('template', $data);
+        } else {
+            $data['notif'] = "Silahkan login terlebih dahulu.";
+            $this->load->view('login', $data);
+        }
+    }
+
+    public function daftar_pesan() {
+        if ($this->session->userdata('logged_in') == true) {
+            $data['judul'] = "Daftar Pesan";
+            $data['main_view'] = 'daftar_pesan';
+            $data['pesan'] = $this->UserModel->getAll('pesan');
             $this->load->view('template', $data);
         } else {
             $data['notif'] = "Silahkan login terlebih dahulu.";

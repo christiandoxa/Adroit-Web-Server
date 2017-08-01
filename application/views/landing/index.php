@@ -15,15 +15,14 @@
     <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
 
     <!-- CSS -->
-
     <link rel="stylesheet" href="<?php echo base_url('assets/main/') ?>css/bootstrap.min.css">
     <link rel="stylesheet" href="<?php echo base_url('assets/main/') ?>css/font-awesome.min.css">
     <link rel="stylesheet" href="<?php echo base_url('assets/main/') ?>css/owl.carousel.css">
     <link rel="stylesheet" href="<?php echo base_url('assets/main/') ?>css/animate.css">
     <link rel="stylesheet" href="<?php echo base_url('assets/main/') ?>css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.6/sweetalert2.min.css"/>
     <!-- Responsive Stylesheet -->
     <link rel="stylesheet" href="<?php echo base_url('assets/main/') ?>css/responsive.css">
-    <link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/sweetalert') ?>/sweetalert.css">
 </head>
 
 <body id="body">
@@ -66,7 +65,7 @@
                         dengan berbagai perangkat IoT milik AdroitDevs dengan berbagai fitur yang tersedia dengan
                         berbagai kemudahan</p>
                     <div class="wow fadeInDown" data-wow-delay="0.3s">
-                        <a class="btn btn-default btn-home" href="#about" role="button">Get Started</a>
+                        <a class="btn btn-default btn-home" href="#" onclick="get_started()">Daftar</a>
                     </div>
                 </div>
             </div>
@@ -242,7 +241,7 @@ Contact start
 <script src="<?php echo base_url('assets/main/') ?>js/jquery.sticky.js"></script>
 <script src="<?php echo base_url('assets/main/') ?>js/plugins.js"></script>
 <script src="<?php echo base_url('assets/main/') ?>js/wow.min.js"></script>
-<script src="<?php echo base_url('assets/sweetalert') ?>/sweetalert.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.6/sweetalert2.min.js"></script>
 <script src="<?php echo base_url('assets/main/') ?>js/main.js"></script>
 <?php
 if (!empty($message)) {

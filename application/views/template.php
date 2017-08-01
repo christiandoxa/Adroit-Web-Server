@@ -97,6 +97,10 @@
                         <a href="<?php echo base_url('dashboard/daftar_perangkat') ?>"><i
                                     class="fa fa-cloud fa-fw"></i> Daftar Perangkat</a>
                     </li>
+                    <li>
+                        <a href="<?php echo base_url('dashboard/daftar_pesan') ?>"><i
+                                    class="fa fa-comment fa-fw"></i> Daftar Pesan</a>
+                    </li>
                 </ul>
             </div>
             <!-- /.sidebar-collapse -->
