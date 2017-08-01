@@ -38,4 +38,25 @@ class GenerateToken extends CI_Model {
         $hash = base64_encode($randnumb2 . "?" . base64_encode($email . $password) . "!" . $randnumb);
         return $hash;
     }
+
+    public function getPass()
+    {
+        $randnumb = null;
+        $randnumb2 = null;
+        $codeAlphabet = "abcdefghijklmnopqrstuvwxyz";
+        $codeAlphabet .= "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        $codeAlphabet .= "0123456789";
+        $max = strlen($codeAlphabet);
+
+        for ($i = 0; $i < rand(5, 6); $i++) {
+            $randnumb .= $codeAlphabet[$this->rand_alphnum(0, $max - 1)];
+        }
+
+        for ($i = 0; $i < rand(1, 3); $i++) {
+            $randnumb2 .= $codeAlphabet[$this->rand_alphnum(0, $max - 1)];
+        }
+
+        $password = sha1($randnumb . $randnumb2);
+        return $password;
+    }
 }
