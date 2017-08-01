@@ -74,16 +74,15 @@ class LoginAwal extends CI_Controller
         $nama = base64_decode($this->input->post('name'));
         $password = base64_decode($this->input->post('password'));
 
-        $data = array(
-            'email' => $email,
-            'kata_sandi' => $password,
-            'nama' => $nama
-        );
-
         $query = $this->db->where('email', $email)->get('akun');
         if ($query->num_rows() > 0) {
             echo json_encode(array('status' => 'Already Exist'));
         } else {
+            $data = array(
+                'email' => $email,
+                'kata_sandi' => $password,
+                'nama' => $nama
+            );
             $this->db->insert('akun', $data);
             if ($this->db->affected_rows() > 0) {
                 echo json_encode(array('status' => self::SUCCESS));
