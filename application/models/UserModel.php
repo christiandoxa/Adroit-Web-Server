@@ -52,6 +52,16 @@ class UserModel extends CI_Model {
         }
     }
 
+    public function cekPreOrder($email) {
+        $query = $this->db->where('email', $email)
+            ->get('subscriber');
+        if ($query->num_rows() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public function login() {
         $username = $this->input->post('username');
         $password = $this->input->post('password');

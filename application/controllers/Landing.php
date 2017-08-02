@@ -5,10 +5,30 @@ class Landing extends CI_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('UserModel');
+        $this->load->model('Email');
     }
 
     public function index() {
         $this->load->view('/landing/index');
+    }
+
+    public function pre_order() {
+        $email = $this->input->get('email');
+        $data = array(
+            'pre_order' => 'sudah'
+        );
+
+        if ($this->UserModel->cekPreOrder($email) == true) {
+            if ($this->UserModel->update('subscriber', 'email', $email, $data) == true) {
+                $view['message'] = 'Pre Order berhasil dilakukan, kami akan menghubungi anda.';
+                $this->load->view('landing/index', $view);
+            } else {
+                $view['messagef'] = 'Pre Order gagal dilakukan, silahkan coba lagi.';
+                $this->load->view('landing/index', $view);
+            }
+        } else {
+            redirect('errorpage');
+        }
     }
 
     public function subscribe() {
@@ -25,7 +45,11 @@ class Landing extends CI_Controller {
 
             if ($this->UserModel->cekSubscriber() == true) {
                 if ($this->UserModel->insert('subscriber', $data) == true) {
-                    return true;
+                    if ($this->Email->new_subscriber($nama, $email, $telepon) == true) {
+                        return true;
+                    } else {
+                        return false;
+                    }
                 } else {
                     return false;
                 }

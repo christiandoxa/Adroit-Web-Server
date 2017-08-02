@@ -48,6 +48,7 @@
         <nav class="collapse navbar-collapse" id="navbar">
             <ul class="nav navbar-nav navbar-right" id="top-nav">
                 <li class="current"><a href="#body">Home</a></li>
+                <li><a href="#about">About us</a></li>
                 <li><a href="#service">Services</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
@@ -73,6 +74,26 @@
     </div><!-- .container close -->
 </section><!-- header close -->
 
+<section id="about" class="section">
+    <div class="container">
+        <div class="row">
+            <div class=" wow fadeInLeft">
+                <div class="sub-heading">
+                    <h3>Lakukan aktivitas lebih mudah dan murah dengan Angkat.In</h3>
+                </div>
+                <div class="block">
+                    <p>Angkat.In sebagai produk pertama keluaran dari Adroit Devs merupakan suatu alat penjemur pakaian
+                        yang pintar karena dapat mengatur waktu jemur yang sesuai dan mendeteksi cuaca serta intensitas
+                        cahaya yang tepat. Terlebih lagi dapat terintegrasi dengan perangkat android untuk para konsumen
+                        sehingga mudah diakses bagi pecinta gawai pintar. Cukup daftarkan produk dan Anda dapat
+                        mengendalikan dan mengatur perangkat Anda di manapun dan kapanpun.</p>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section><!-- #about close -->
+
 <!--
 Service start
 ==================== -->
@@ -95,6 +116,7 @@ Service start
                     </div>
                     <div class="caption">
                         <h3>Fully Responsive</h3>
+                        <p>Tampilan yang menarik dan mudah digunakan</p>
                     </div>
                 </div>
             </div>
@@ -107,6 +129,7 @@ Service start
                     </div>
                     <div class="caption">
                         <h3>Speed Optimized</h3>
+                        <p>Data cuaca yang disajikan <i>real time</i> langsung di perangkat Anda</p>
                     </div>
                 </div>
             </div>
@@ -119,6 +142,7 @@ Service start
                     </div>
                     <div class="caption">
                         <h3>Tons of Feature</h3>
+                        <p>Berbagai pilihan untuk mengatur perangkat Anda</p>
                     </div>
                 </div>
             </div>
@@ -131,6 +155,7 @@ Service start
                     </div>
                     <div class="caption">
                         <h3>Cloud Option</h3>
+                        <p>Penyimpanan yang berbasis <i>cloud</i> sehingga ringan pada perangkat Anda</p>
                     </div>
                 </div>
             </div>
@@ -201,7 +226,7 @@ Contact start
                             <textarea class="form-control" placeholder="Your Message" rows="3"
                                       name="message"></textarea>
                         </div>
-                        <input class="btn btn-send" type="submit" name="submit" value="Send me">
+                        <input class="btn btn-send" type="submit" name="submit" value="Send">
                     </form>
 
                     <div id="success">
