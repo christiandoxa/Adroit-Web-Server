@@ -87,14 +87,99 @@ $(document).ready(function () {
             $(form).ajaxSubmit({
                 type: "POST",
                 data: $(form).serialize(),
-                url: "http://localhost/Adroit_Web/landing/subscribe",
+                url: "http://localhost/Adroit_Web/landing/subscribe_email",
                 success: function () {
-                    swal("Thanks!", "Your message sent successfully", "success");
+                    swal("Thanks!", "Your email is now registered", "success");
                 },
                 error: function () {
-                    swal("Sorry!", "Your message not delivered successfully, please try again", "error");
+                    swal("Sorry!", "Your email is not registered successfully, please try again", "error");
                 }
             });
         }
     });
 });
+
+function get_started() {
+    swal.setDefaults({
+        input: 'text',
+        confirmButtonText: 'Next &rarr;',
+        showCancelButton: true,
+        animation: false,
+        progressSteps: ['1', '2', '3']
+    });
+
+    var steps = [
+        {
+            name: 'name',
+            title: 'Nama Lengkap',
+            input: 'text',
+            inputValidator: function (value) {
+                return new Promise(function (resolve, reject) {
+                    if (value === "") {
+                        reject('Harap masukkan nama anda')
+                    } else if (value.length < 7) {
+                        reject('Harap input data dengan benar!')
+                    }
+                    else {
+                        resolve()
+                    }
+                })
+            }
+        },
+        {
+            name: 'email',
+            title: 'Email',
+            input: 'email'
+        },
+        {
+            name: 'telepon',
+            title: 'Nomor Telefon',
+            input: 'text',
+            inputValidator: function (value) {
+                return new Promise(function (resolve, reject) {
+                    if (value === "") {
+                        reject('Harap masukkan nomor telefon anda')
+                    } else if (value.length < 11 || isNaN(value) || value.length > 12) {
+                        reject('Harap input data dengan benar!')
+                    }
+                    else {
+                        resolve()
+                    }
+                })
+            }
+        }
+    ];
+
+    swal.queue(steps).then(function (result) {
+        swal.resetDefaults();
+        var data = {
+            'name': result[0],
+            'email': result[1],
+            'telepon': result[2],
+            'submit': true
+        };
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost/Adroit_Web/landing/subscribe',
+            data: data,
+            success: function () {
+                swal({
+                    title: 'Terima kasih!',
+                    text: 'Bpk/Ibu ' + result[0] + ' telah terdaftar dalam sistem kami.',
+                    confirmButtonText: 'OK!',
+                    showCancelButton: false
+                })
+            },
+            error: function () {
+                swal({
+                    title: 'Mohon maaf!',
+                    text: 'Bpk/Ibu ' + result[0] + ' belum terdaftar dalam sistem kami. Silahkan coba lagi.',
+                    confirmButtonText: 'OK!',
+                    showCancelButton: false
+                })
+            }
+        });
+    }, function () {
+        swal.resetDefaults()
+    })
+}

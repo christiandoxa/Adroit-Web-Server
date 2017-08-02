@@ -97,6 +97,10 @@
                         <a href="<?php echo base_url('dashboard/daftar_perangkat') ?>"><i
                                     class="fa fa-cloud fa-fw"></i> Daftar Perangkat</a>
                     </li>
+                    <li>
+                        <a href="<?php echo base_url('dashboard/daftar_pesan') ?>"><i
+                                    class="fa fa-comment fa-fw"></i> Daftar Pesan</a>
+                    </li>
                 </ul>
             </div>
             <!-- /.sidebar-collapse -->
@@ -152,32 +156,7 @@
 <script src="<?php echo base_url() ?>assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 <script src="<?php echo base_url() ?>assets/vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
 <script src="<?php echo base_url() ?>assets/vendor/datatables-responsive/dataTables.responsive.js"></script>
-
-<script>
-    $(document).ready(function () {
-        $('#dataTables-example').DataTable({
-            "aoColumnDefs": [{"bSortable": false, "aTargets": [3]},
-                {"bSearchable": false, "aTargets": [3]}],
-            responsive: true
-        });
-    });
-
-    $(document).ready(function () {
-        $('#dataTables-device').DataTable({
-            "aoColumnDefs": [{"bSortable": false, "aTargets": [1]},
-                {"bSearchable": false, "aTargets": [1]}],
-            responsive: true
-        });
-    });
-
-    $(document).ready(function () {
-        $('#dataTables-2').DataTable({
-            "aoColumnDefs": [{"bSortable": false, "aTargets": [2]},
-                {"bSearchable": false, "aTargets": [2]}],
-            responsive: true
-        });
-    });
-</script>
+<script src="<?php echo base_url() ?>assets/template/table.js"></script>
 
 </body>
 

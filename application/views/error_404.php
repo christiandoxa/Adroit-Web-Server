@@ -12,6 +12,7 @@
             window.scrollTo(0, 1);
         } </script>
     <!-- Custom Theme files -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.6/sweetalert2.min.css"/>
     <link href="<?php echo base_url('assets/error/') ?>css/style.css" rel="stylesheet" type="text/css" media="all"/>
     <!-- //Custom Theme files -->
     <!-- web font -->
@@ -27,11 +28,14 @@
     <h2>404</h2>
     <p><span class="sub-agileinfo">Sorry! </span>The page you requested was not found!....</p>
     <!--form-->
-    <form class="newsletter" action="#" method="post">
-        <input class="email" type="email" placeholder="Your email..." required=" ">
-        <input type="submit" class="submit" value="">
-    </form>
-
+    <div class="form-group">
+        <form class="newsletter" id="subscribe" action="#" method="post">
+            <input class="form-control" placeholder="Enter Your Email Address" name="email" type="email"
+                   required>
+            <input style="vertical-align: middle;width: 10%" name="submit"
+                   class="text-center btn btn-default btn-submit" type="submit" value="   ">
+        </form>
+    </div>
     <!--//form-->
 </div>
 <!--//mian-content-->
@@ -43,3 +47,26 @@
 
 </body>
 </html>
+<script src="<?php echo base_url('assets/main/') ?>js/vendor/jquery-1.10.2.min.js"></script>
+<script src="<?php echo base_url('assets/main/') ?>js/jquery.validate.min.js"></script>
+<script src="<?php echo base_url('assets/main/') ?>js/jquery.form.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.6/sweetalert2.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#subscribe").validate({
+            submitHandler: function (form) {
+                $(form).ajaxSubmit({
+                    type: "POST",
+                    data: $(form).serialize(),
+                    url: "http://localhost/Adroit_Web/landing/subscribe_email",
+                    success: function () {
+                        swal("Thanks!", "Your email is now registered", "success");
+                    },
+                    error: function () {
+                        swal("Sorry!", "Your email is not registered successfully, please try again", "error");
+                    }
+                });
+            }
+        });
+    });
+</script>

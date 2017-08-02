@@ -14,8 +14,13 @@ class Landing extends CI_Controller {
     public function subscribe() {
         if ($this->input->post('submit')) {
             $email = $this->input->post('email');
+            $nama = $this->input->post('name');
+            $telepon = $this->input->post('telepon');
+
             $data = array(
-                'email' => $email
+                'email' => $email,
+                'nama_pelanggan' => $nama,
+                'nomor_telepon' => $telepon
             );
 
             if ($this->UserModel->cekSubscriber() == true) {
@@ -28,7 +33,28 @@ class Landing extends CI_Controller {
                 return false;
             }
         } else {
-            redirect(base_url('errorpage'));
+            redirect(base_url('ErrorPage'));
+        }
+    }
+
+    public function subscribe_email() {
+        if ($this->input->post('submit')) {
+            $email = $this->input->post('email');
+            $data = array(
+                'email' => $email,
+            );
+
+            if ($this->UserModel->cekSubscriber() == true) {
+                if ($this->UserModel->insert('subscriber', $data) == true) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } else {
+            redirect(base_url('ErrorPage'));
         }
     }
 
@@ -70,11 +96,22 @@ class Landing extends CI_Controller {
             // Message in email
             $this->email->message($message);
 
-            if ($this->email->send()) {
-                return true;
+            $data = array(
+                'email' => $email_customer,
+                'nama_pengirim' => $nama_customer,
+                'pesan' => $pesan_customer,
+            );
+
+            if ($this->UserModel->insert('pesan', $data)) {
+                if ($this->email->send()) {
+                    return true;
+                } else {
+                    return false;
+                }
             } else {
                 return false;
             }
+
         } else {
             redirect(base_url('errorpage'));
         }

@@ -34,7 +34,7 @@
                     <tr>
                     <td class="text-center" style="vertical-align: middle">' . $data->nama . '</td>
                     <td class="text-center" style="vertical-align: middle">' . $data->email . '</td>
-                    <td class="text-center" style="vertical-align: middle; max-width: 150px; overflow: hidden;text-overflow: ellipsis";>' . $data->token . '</td>
+                    <td class="text-center" style="vertical-align: middle; max-width: 150px; overflow: hidden;text-overflow: ellipsis">' . $data->token . '</td>
                     <td class="text-center" style="vertical-align: middle">
                         <a href="' . base_url('dashboard/detail_pengguna?email=' . $data->email) . '" class="btn btn-info btn-sm">
                             <i class="glyphicon glyphicon-search"></i> Lihat
