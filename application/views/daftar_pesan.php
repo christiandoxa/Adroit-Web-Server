@@ -1,3 +1,11 @@
+<style>
+    .ellipses {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: 150px;
+    }
+</style>
 <div class="col-lg-12">
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -5,7 +13,7 @@
         </div>
         <!-- /.panel-heading -->
         <div class="panel-body">
-            <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+            <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-pesan">
                 <?php
                 if (!empty($notif)) {
                     echo '<div class="alert alert-danger alert-dismissable">';
@@ -42,14 +50,14 @@
                     <tr>
                     <td class="text-center" style="vertical-align: middle">' . $data->email . '</td>
                     <td class="text-center" style="vertical-align: middle">' . $data->nama_pengirim . '</td>
-                    <td class="text-center" style="vertical-align: middle; max-width: 150px; max-height: 50px; overflow: hidden;text-overflow: ellipsis;max-lines: 1">' . $data->pesan . '</td>
+                    <td class="text-center ellipses" style="vertical-align: middle">' . $data->pesan . '</td>
                     <td class="text-center" style="vertical-align: middle;">' . $data->tanggal_terkirim . '</td>
                     <td class="text-center" style="vertical-align: middle">' . '<i class="fa ' . $icon . '"></i>' . '</td>
                     <td class="text-center" style="vertical-align: middle">
-                        <a href="' . base_url('dashboard/detail_pesan?email=' . $data->email) . '" class="btn btn-info btn-sm">
+                        <a href="' . base_url('dashboard/detail_pesan?id=' . $data->id_pesan) . '" class="btn btn-info btn-sm">
                             <i class="glyphicon glyphicon-search"></i> Lihat
                         </a>
-                        <a href="' . base_url('dashboard/hapus_pesan?email=' . $data->email) . '" class="btn btn-danger btn-sm">
+                        <a href="' . base_url('dashboard/hapus_pesan?id=' . $data->id_pesan) . '" class="btn btn-danger btn-sm">
                             <i class="glyphicon glyphicon-trash"></i> Hapus
                         </a>
                     </td>

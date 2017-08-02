@@ -23,6 +23,73 @@ class Dashboard extends CI_Controller {
         }
     }
 
+    public function kirim_pesan() {
+        if ($this->session->userdata('logged_in') == true) {
+            if ($this->input->post('submit')) {
+                $id_pesan = $this->input->get('id');
+                $balasan = $this->input->post('balas');
+                $status = 'dibalas';
+                $email_pengirim = $this->input->post('email');
+                $data = array(
+                    'balasan' => $balasan,
+                    'status' => $status
+                );
+
+                if ($this->UserModel->update('pesan', 'id_pesan', $id_pesan, $data)) {
+                    $sender_email = 'customeradroit@gmail.com';
+                    $user_password = '@Adroitisthebest1#!';
+                    $receiver_email = $email_pengirim;
+                    $subject = 'Reply From Adroit';
+                    $message = $balasan;
+
+                    // Configure email library
+                    $config['protocol'] = 'smtp';
+                    $config['smtp_host'] = 'ssl://smtp.googlemail.com';
+                    $config['smtp_port'] = 465;
+                    $config['smtp_user'] = $sender_email;
+                    $config['smtp_pass'] = $user_password;
+                    $config['mailtype'] = 'html';
+
+                    // Load email library and passing configured values to email library
+                    $this->load->library('email', $config);
+                    $this->email->set_newline("\r\n");
+
+                    // Sender email address
+                    $this->email->from('customeradroit@gmail.com', "Customer Adroit Apps Service");
+                    // Receiver email address
+                    $this->email->to($receiver_email);
+                    // Subject of email
+                    $this->email->subject($subject);
+                    // Message in email
+                    $this->email->message($message);
+
+                    if ($this->email->send()) {
+                        $data['judul'] = 'Detail Pesan';
+                        $data['notifs'] = 'Email sukses terkirim';
+                        $data['main_view'] = 'detail_pesan';
+                        $data['detail'] = $this->UserModel->getWhere('pesan', 'id_pesan', $id_pesan);
+                        $this->load->view('template', $data);
+                    } else {
+                        $data['judul'] = 'Detail Pesan';
+                        $data['notif'] = 'Email gagal terkirim';
+                        $data['main_view'] = 'detail_pesan';
+                        $data['detail'] = $this->UserModel->getWhere('pesan', 'id_pesan', $id_pesan);
+                        $this->load->view('template', $data);
+                    }
+                } else {
+                    $data['judul'] = 'Detail Pesan';
+                    $data['notif'] = 'Gagal insert ke database';
+                    $data['main_view'] = 'detail_pesan';
+                    $data['detail'] = $this->UserModel->getWhere('pesan', 'id_pesan', $id_pesan);
+                    $this->load->view('template', $data);
+                }
+            }
+        } else {
+            $data['notif'] = "Silahkan login terlebih dahulu.";
+            $this->load->view('login', $data);
+        }
+    }
+
     public function tambah_pengguna() {
         if ($this->session->userdata('logged_in') == true) {
             $data['judul'] = 'Tambah Pengguna';
@@ -65,10 +132,10 @@ class Dashboard extends CI_Controller {
 
     public function detail_pesan() {
         if ($this->session->userdata('logged_in') == true) {
-            $email = $this->input->get('email');
+            $id_pesan = $this->input->get('id');
             $data['judul'] = 'Detail Pesan';
             $data['main_view'] = 'detail_pesan';
-            $data['detail'] = $this->UserModel->getWhere('pesan', 'email', $email);
+            $data['detail'] = $this->UserModel->getWhere('pesan', 'id_pesan', $id_pesan);
             $this->load->view('template', $data);
         } else {
             $data['notif'] = 'Silahkan login terlebih dahulu.';

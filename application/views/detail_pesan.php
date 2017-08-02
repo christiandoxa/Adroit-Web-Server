@@ -13,7 +13,7 @@
     }
     ?>
     <form style="padding-bottom: 10%" method="post"
-          action="<?php echo base_url() ?>dashboard/kirim_pesan?token=<?php echo $detail->email ?>"
+          action="<?php echo base_url() ?>dashboard/kirim_pesan?id=<?php echo $detail->id_pesan ?>"
           enctype="multipart/form-data">
         <div class="form-group">
             <label>Email</label>
@@ -37,7 +37,8 @@
         </div>
         <div class="form-group">
             <label>Balas</label>
-            <textarea class="form-control" id="balas" name="balas"></textarea>
+            <textarea class="form-control" id="balas"
+                      name="balas"><?php if (!empty($detail->balasan)) echo $detail->balasan ?></textarea>
         </div>
         <br>
         <input type="submit" name="submit" value="Kirim" class="btn btn-success">

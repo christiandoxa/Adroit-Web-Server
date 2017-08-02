@@ -96,11 +96,22 @@ class Landing extends CI_Controller {
             // Message in email
             $this->email->message($message);
 
-            if ($this->email->send()) {
-                return true;
+            $data = array(
+                'email' => $email_customer,
+                'nama_pengirim' => $nama_customer,
+                'pesan' => $pesan_customer,
+            );
+
+            if ($this->UserModel->insert('pesan', $data)) {
+                if ($this->email->send()) {
+                    return true;
+                } else {
+                    return false;
+                }
             } else {
                 return false;
             }
+
         } else {
             redirect(base_url('errorpage'));
         }
