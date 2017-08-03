@@ -30,3 +30,11 @@ $(document).ready(function () {
         responsive: true
     });
 });
+
+$(document).ready(function () {
+    $('#dataTables-pelanggan-baru').DataTable({
+        "aoColumnDefs": [{"bSortable": false, "aTargets": [3, 4]},
+            {"bSearchable": false, "aTargets": [3, 4]}],
+        responsive: true
+    });
+});

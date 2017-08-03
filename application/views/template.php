@@ -101,6 +101,10 @@
                         <a href="<?php echo base_url('dashboard/daftar_pesan') ?>"><i
                                     class="fa fa-comment fa-fw"></i> Daftar Pesan</a>
                     </li>
+                    <li>
+                        <a href="<?php echo base_url('dashboard/daftar_pelanggan_baru') ?>"><i
+                                    class="fa fa-users fa-fw"></i> Daftar Pelanggan Baru</a>
+                    </li>
                 </ul>
             </div>
             <!-- /.sidebar-collapse -->
