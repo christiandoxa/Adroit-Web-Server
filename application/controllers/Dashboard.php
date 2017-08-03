@@ -16,12 +16,29 @@ class Dashboard extends CI_Controller {
             $data['pengguna'] = $this->UserModel->count('akun');
             $data['perangkat'] = $this->UserModel->count('device');
             $data['pesan'] = $this->UserModel->count('pesan');
+            $data['pelanggan'] = $this->UserModel->count('subscriber');
             $this->load->view('template', $data);
         } else {
             $data['notif'] = "Silahkan login terlebih dahulu.";
             $this->load->view('login', $data);
         }
     }
+
+    public function broadcast_email_pengguna() {
+        if ($this->session->userdata('logged_in') == true) {
+            $data['judul'] = 'Broadcast Email Pengguna';
+            $data['main_view'] = 'broadcast_email';
+            $this->load->view('template', $data);
+        } else {
+            $data['notif'] = "Silahkan login terlebih dahulu.";
+            $this->load->view('login', $data);
+        }
+    }
+
+    public function broadcast_email_pelanggan() {
+
+    }
+
 
     public function kirim_pesan() {
         if ($this->session->userdata('logged_in') == true) {
@@ -222,11 +239,11 @@ class Dashboard extends CI_Controller {
         }
     }
 
-    public function detail_pelanggan_baru() {
+    public function detail_pelanggan() {
         if ($this->session->userdata('logged_in') == true) {
             $email = $this->input->get('email');
-            $data['judul'] = 'Detail Pelanggan Baru';
-            $data['main_view'] = 'detail_pelanggan_baru';
+            $data['judul'] = 'Detail Pelanggan';
+            $data['main_view'] = 'detail_pelanggan';
             $data['detail'] = $this->UserModel->getWhere('subscriber', 'email', $email);
             $this->load->view('template', $data);
 
@@ -236,11 +253,11 @@ class Dashboard extends CI_Controller {
         }
     }
 
-    public function daftar_pelanggan_baru() {
+    public function daftar_pelanggan() {
         if ($this->session->userdata('logged_in') == true) {
-            $data['judul'] = 'Daftar Pelanggan Baru';
-            $data['main_view'] = 'daftar_pelanggan_baru';
-            $data['pelanggan_baru'] = $this->UserModel->getAll('subscriber');
+            $data['judul'] = 'Daftar Pelanggan';
+            $data['main_view'] = 'daftar_pelanggan';
+            $data['pelanggan'] = $this->UserModel->getAll('subscriber');
             $this->load->view('template', $data);
         } else {
             $data['notif'] = 'Silahkan login terlebih dahulu';
@@ -528,6 +545,50 @@ class Dashboard extends CI_Controller {
                 $data['main_view'] = 'daftar_perangkat';
                 $data['perangkat'] = $this->UserModel
                     ->query('SELECT nama, email, device_id FROM akun NATURAL JOIN device;');
+                $this->load->view('template', $data);
+            }
+        } else {
+            $data['notif'] = "Silahkan login terlebih dahulu.";
+            $this->load->view('login', $data);
+        }
+    }
+
+    public function hapus_pesan() {
+        if ($this->session->userdata('logged_in') == true) {
+            $id_pesan = $this->input->get('id');
+            if ($this->UserModel->delete('pesan', 'id_pesan', $id_pesan) == true) {
+                $data['judul'] = 'Daftar Pesan';
+                $data['notifs'] = 'Hapus Berhasil';
+                $data['main_view'] = 'daftar_pesan';
+                $data['pesan'] = $this->UserModel->getAll('pesan');
+                $this->load->view('template', $data);
+            } else {
+                $data['judul'] = 'Daftar Pesan';
+                $data['notif'] = 'Hapus Gagal';
+                $data['main_view'] = 'daftar_pesan';
+                $data['pesan'] = $this->UserModel->getAll('pesan');
+                $this->load->view('template', $data);
+            }
+        } else {
+            $data['notif'] = "Silahkan login terlebih dahulu.";
+            $this->load->view('login', $data);
+        }
+    }
+
+    public function hapus_pelanggan() {
+        if ($this->session->userdata('logged_in') == true) {
+            $email = $this->input->get('email');
+            if ($this->UserModel->delete('subscriber', 'email', $email) == true) {
+                $data['judul'] = 'Daftar Pelanggan';
+                $data['notifs'] = 'Hapus Berhasil';
+                $data['main_view'] = 'daftar_pelanggan';
+                $data['pelanggan'] = $this->UserModel->getAll('subscriber');
+                $this->load->view('template', $data);
+            } else {
+                $data['judul'] = 'Daftar Pelanggan';
+                $data['notif'] = 'Hapus Gagal';
+                $data['main_view'] = 'daftar_pelanggan';
+                $data['pelanggan'] = $this->UserModel->getAll('subscriber');
                 $this->load->view('template', $data);
             }
         } else {

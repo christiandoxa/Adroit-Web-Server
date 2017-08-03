@@ -9,6 +9,10 @@ class UserModel extends CI_Model {
         return $this->db->get($table)->result();
     }
 
+    public function getRowArray($table, $column) {
+        return $this->db->select($column)->get($table)->result_array();
+    }
+
     public function insert($table, $data) {
         $this->db->insert($table, $data);
         if ($this->db->affected_rows() > 0) {
