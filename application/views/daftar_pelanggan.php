@@ -30,7 +30,7 @@
                 </thead>
                 <tbody>
                 <?php
-                foreach ($pelanggan_baru as $data) {
+                foreach ($pelanggan as $data) {
                     $icon = null;
                     if ($data->pre_order == 'belum') {
                         $icon = 'fa-minus';
@@ -44,10 +44,10 @@
                     <td class="text-center" style="vertical-align: middle; max-width: 150px; overflow: hidden;text-overflow: ellipsis">' . $data->nomor_telepon . '</td>
                     <td class="text-center" style="vertical-align: middle;">' . '<i class="fa ' . $icon . '"></i>' . '</td>
                     <td class="text-center" style="vertical-align: middle">
-                        <a href="' . base_url('dashboard/detail_pelanggan_baru?email=' . $data->email) . '" class="btn btn-info btn-sm">
+                        <a href="' . base_url('dashboard/detail_pelanggan?email=' . $data->email) . '" class="btn btn-info btn-sm">
                             <i class="glyphicon glyphicon-search"></i> Lihat
                         </a>
-                        <a href="' . base_url('dashboard/hapus_pelanggan_baru?email=' . $data->email) . '" class="btn btn-danger btn-sm">
+                        <a href="' . base_url('dashboard/hapus_pelanggan?email=' . $data->email) . '" class="btn btn-danger btn-sm">
                             <i class="glyphicon glyphicon-trash"></i> Hapus
                         </a>
                     </td>
