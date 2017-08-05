@@ -50,12 +50,15 @@ class Dashboard extends CI_Controller {
 
     public function broadcast_pengguna() {
         if ($this->session->userdata('logged_in') == true) {
-            $email = 'Test Broadcast';
+            $email = $this->input->post('email');
             $sender_email = 'customeradroit@gmail.com';
             $user_password = '@Adroitisthebest1#!';
-            $tujuan = $this->UserModel->getColumnArray('akun', 'email');
-            $arrayt = $this->UserModel->getColumnArray('subscriber', 'email');
-            $receiver_email = $arrayt;
+            $daftar_pengguna = $this->UserModel->getColumnArray('akun', 'email');
+            $string_pengguna = array();
+            foreach ($daftar_pengguna as $item => $value) {
+                $string_pengguna[] = $value['email'];
+            }
+            $receiver_email = $string_pengguna;
             $subject = 'News From Adroit';
             $message = $email;
 
@@ -74,16 +77,17 @@ class Dashboard extends CI_Controller {
             // Sender email address
             $this->email->from('customeradroit@gmail.com', "Adroit Apps Service");
             // Receiver email address
-            $this->email->to($receiver_email);
+            $this->email->to('customeradroit@gmail.com');
+            $this->email->bcc($receiver_email);
             // Subject of email
             $this->email->subject($subject);
             // Message in email
             $this->email->message($message);
 
             if ($this->email->send()) {
-                echo 'berhasil';
+                return true;
             } else {
-                echo $this->email->print_debugger();
+                return false;
             }
 
 
@@ -95,43 +99,49 @@ class Dashboard extends CI_Controller {
 
     public function broadcast_pelanggan() {
         if ($this->session->userdata('logged_in') == true) {
-            if ($this->input->post('submit')) {
-                $email = $this->input->post('email');
-                $sender_email = 'customeradroit@gmail.com';
-                $user_password = '@Adroitisthebest1#!';
-                $receiver_email = $this->UserModel->getColumnArray('subscriber', 'email');
-                $subject = 'News From Adroit';
-                $message = $email;
-
-                // Configure email library
-                $config['protocol'] = 'smtp';
-                $config['smtp_host'] = 'ssl://smtp.googlemail.com';
-                $config['smtp_port'] = 465;
-                $config['smtp_user'] = $sender_email;
-                $config['smtp_pass'] = $user_password;
-                $config['mailtype'] = 'html';
-
-                // Load email library and passing configured values to email library
-                $this->load->library('email', $config);
-                $this->email->set_newline("\r\n");
-
-                // Sender email address
-                $this->email->from('customeradroit@gmail.com', "Adroit Apps Service");
-                // Receiver email address
-                $this->email->to($receiver_email);
-                // Subject of email
-                $this->email->subject($subject);
-                // Message in email
-                $this->email->message($message);
-
-                if ($this->email->send()) {
-                    return true;
-                } else {
-                    return false;
-                }
+            $email = $this->input->post('email');
+            $sender_email = 'customeradroit@gmail.com';
+            $user_password = '@Adroitisthebest1#!';
+            $daftar_pengguna = $this->UserModel->getColumnArray('subscriber', 'email');
+            $string_pengguna = array();
+            foreach ($daftar_pengguna as $item => $value) {
+                $string_pengguna[] = $value['email'];
             }
+            $receiver_email = $string_pengguna;
+            $subject = 'News From Adroit';
+            $message = $email;
+
+            // Configure email library
+            $config['protocol'] = 'smtp';
+            $config['smtp_host'] = 'ssl://smtp.googlemail.com';
+            $config['smtp_port'] = 465;
+            $config['smtp_user'] = $sender_email;
+            $config['smtp_pass'] = $user_password;
+            $config['mailtype'] = 'html';
+
+            // Load email library and passing configured values to email library
+            $this->load->library('email', $config);
+            $this->email->set_newline("\r\n");
+
+            // Sender email address
+            $this->email->from('customeradroit@gmail.com', "Adroit Apps Service");
+            // Receiver email address
+            $this->email->to('customeradroit@gmail.com');
+            $this->email->bcc($receiver_email);
+            // Subject of email
+            $this->email->subject($subject);
+            // Message in email
+            $this->email->message($message);
+
+            if ($this->email->send()) {
+                return true;
+            } else {
+                return false;
+            }
+
+
         } else {
-            $data['notif'] = 'Silahkan login terlebih dahulu';
+            $data['notif'] = 'Silahkan login terlebih dahulu.';
             $this->load->view('login', $data);
         }
     }
