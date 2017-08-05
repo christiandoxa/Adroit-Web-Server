@@ -9,7 +9,7 @@ class UserModel extends CI_Model {
         return $this->db->get($table)->result();
     }
 
-    public function getRowArray($table, $column) {
+    public function getColumnArray($table, $column) {
         return $this->db->select($column)->get($table)->result_array();
     }
 

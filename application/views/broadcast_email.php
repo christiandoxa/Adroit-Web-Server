@@ -26,7 +26,7 @@
     </div>
     <br>
     <div style="align-content: center">
-        <input type="submit" name="submit" value="Broadcast" class="btn btn-success">
+        <input type="submit" name="submit" value="Broadcast" class="btn btn-success" onclick="email()">
         <button id="process" class="btn btn-primary">Preview</button>
         <input type="reset" name="reset" value="Reset" class="btn btn-danger">
     </div>
@@ -82,4 +82,28 @@
 
         }, false);
     }, false);
+
+    function email() {
+        var isi = document.getElementById("core_input").value;
+
+        if (isi !== '') {
+            var data = {
+                'email': isi,
+                'submit': true
+            };
+            $.ajax({
+                type: 'POST',
+                url: '<?php echo base_url()?>dashboard/<?php echo $link?>',
+                data: data,
+                success: function () {
+                    alert('Email berhasil dikirim')
+                },
+                error: function () {
+                    alert('Email gagal dikirim')
+                }
+            });
+        } else {
+            alert('Harap isi bidang email!');
+        }
+    }
 </script>
