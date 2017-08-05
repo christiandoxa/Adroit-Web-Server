@@ -102,8 +102,16 @@
                                     class="fa fa-comment fa-fw"></i> Daftar Pesan</a>
                     </li>
                     <li>
-                        <a href="<?php echo base_url('dashboard/daftar_pelanggan_baru') ?>"><i
-                                    class="fa fa-users fa-fw"></i> Daftar Pelanggan Baru</a>
+                        <a href="<?php echo base_url('dashboard/daftar_pelanggan') ?>"><i
+                                    class="fa fa-users fa-fw"></i> Daftar Pelanggan</a>
+                    </li>
+                    <li>
+                        <a href="<?php echo base_url('dashboard/broadcast_email_pengguna') ?>"><i
+                                    class="fa fa-bullhorn fa-fw"></i> Broadcast Email Pengguna</a>
+                    </li>
+                    <li>
+                        <a href="<?php echo base_url('dashboard/broadcast_email_pelanggan') ?>"><i
+                                    class="fa fa-bullhorn fa-fw"></i> Broadcast Email Pelanggan</a>
                     </li>
                 </ul>
             </div>
@@ -161,7 +169,6 @@
 <script src="<?php echo base_url() ?>assets/vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
 <script src="<?php echo base_url() ?>assets/vendor/datatables-responsive/dataTables.responsive.js"></script>
 <script src="<?php echo base_url() ?>assets/template/table.js"></script>
-
 </body>
 
 </html>

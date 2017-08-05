@@ -27,7 +27,7 @@ class Landing extends CI_Controller {
                 $this->load->view('landing/index', $view);
             }
         } else {
-            redirect('errorpage');
+            redirect(base_url('errorpage'));
         }
     }
 

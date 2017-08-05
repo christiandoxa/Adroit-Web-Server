@@ -16,12 +16,136 @@ class Dashboard extends CI_Controller {
             $data['pengguna'] = $this->UserModel->count('akun');
             $data['perangkat'] = $this->UserModel->count('device');
             $data['pesan'] = $this->UserModel->count('pesan');
+            $data['pelanggan'] = $this->UserModel->count('subscriber');
             $this->load->view('template', $data);
         } else {
             $data['notif'] = "Silahkan login terlebih dahulu.";
             $this->load->view('login', $data);
         }
     }
+
+    public function broadcast_email_pengguna() {
+        if ($this->session->userdata('logged_in') == true) {
+            $data['judul'] = 'Broadcast Email Pengguna';
+            $data['main_view'] = 'broadcast_email';
+            $data['link'] = 'broadcast_pengguna';
+            $this->load->view('template', $data);
+        } else {
+            $data['notif'] = "Silahkan login terlebih dahulu.";
+            $this->load->view('login', $data);
+        }
+    }
+
+    public function broadcast_email_pelanggan() {
+        if ($this->session->userdata('logged_in') == true) {
+            $data['judul'] = 'Broadcast Email Pelanggan';
+            $data['main_view'] = 'broadcast_email';
+            $data['link'] = 'broadcast_pelanggan';
+            $this->load->view('template', $data);
+        } else {
+            $data['notif'] = "Silahkan login terlebih dahulu.";
+            $this->load->view('login', $data);
+        }
+    }
+
+    public function broadcast_pengguna() {
+        if ($this->session->userdata('logged_in') == true) {
+            $email = $this->input->post('email');
+            $sender_email = 'customeradroit@gmail.com';
+            $user_password = '@Adroitisthebest1#!';
+            $daftar_pengguna = $this->UserModel->getColumnArray('akun', 'email');
+            $string_pengguna = array();
+            foreach ($daftar_pengguna as $item => $value) {
+                $string_pengguna[] = $value['email'];
+            }
+            $receiver_email = $string_pengguna;
+            $subject = 'News From Adroit';
+            $message = $email;
+
+            // Configure email library
+            $config['protocol'] = 'smtp';
+            $config['smtp_host'] = 'ssl://smtp.googlemail.com';
+            $config['smtp_port'] = 465;
+            $config['smtp_user'] = $sender_email;
+            $config['smtp_pass'] = $user_password;
+            $config['mailtype'] = 'html';
+
+            // Load email library and passing configured values to email library
+            $this->load->library('email', $config);
+            $this->email->set_newline("\r\n");
+
+            // Sender email address
+            $this->email->from('customeradroit@gmail.com', "Adroit Apps Service");
+            // Receiver email address
+            $this->email->to('customeradroit@gmail.com');
+            $this->email->bcc($receiver_email);
+            // Subject of email
+            $this->email->subject($subject);
+            // Message in email
+            $this->email->message($message);
+
+            if ($this->email->send()) {
+                return true;
+            } else {
+                return false;
+            }
+
+
+        } else {
+            $data['notif'] = 'Silahkan login terlebih dahulu.';
+            $this->load->view('login', $data);
+        }
+    }
+
+    public function broadcast_pelanggan() {
+        if ($this->session->userdata('logged_in') == true) {
+            $email = $this->input->post('email');
+            $sender_email = 'customeradroit@gmail.com';
+            $user_password = '@Adroitisthebest1#!';
+            $daftar_pengguna = $this->UserModel->getColumnArray('subscriber', 'email');
+            $string_pengguna = array();
+            foreach ($daftar_pengguna as $item => $value) {
+                $string_pengguna[] = $value['email'];
+            }
+            $receiver_email = $string_pengguna;
+            $subject = 'News From Adroit';
+            $message = $email;
+
+            // Configure email library
+            $config['protocol'] = 'smtp';
+            $config['smtp_host'] = 'ssl://smtp.googlemail.com';
+            $config['smtp_port'] = 465;
+            $config['smtp_user'] = $sender_email;
+            $config['smtp_pass'] = $user_password;
+            $config['mailtype'] = 'html';
+
+            // Load email library and passing configured values to email library
+            $this->load->library('email', $config);
+            $this->email->set_newline("\r\n");
+
+            // Sender email address
+            $this->email->from('customeradroit@gmail.com', "Adroit Apps Service");
+            // Receiver email address
+            $this->email->to('customeradroit@gmail.com');
+            $this->email->bcc($receiver_email);
+            // Subject of email
+            $this->email->subject($subject);
+            // Message in email
+            $this->email->message($message);
+
+            if ($this->email->send()) {
+                return true;
+            } else {
+                return false;
+            }
+
+
+        } else {
+            $data['notif'] = 'Silahkan login terlebih dahulu.';
+            $this->load->view('login', $data);
+        }
+    }
+
 
     public function kirim_pesan() {
         if ($this->session->userdata('logged_in') == true) {
@@ -222,11 +346,11 @@ class Dashboard extends CI_Controller {
         }
     }
 
-    public function detail_pelanggan_baru() {
+    public function detail_pelanggan() {
         if ($this->session->userdata('logged_in') == true) {
             $email = $this->input->get('email');
-            $data['judul'] = 'Detail Pelanggan Baru';
-            $data['main_view'] = 'detail_pelanggan_baru';
+            $data['judul'] = 'Detail Pelanggan';
+            $data['main_view'] = 'detail_pelanggan';
             $data['detail'] = $this->UserModel->getWhere('subscriber', 'email', $email);
             $this->load->view('template', $data);
 
@@ -236,11 +360,11 @@ class Dashboard extends CI_Controller {
         }
     }
 
-    public function daftar_pelanggan_baru() {
+    public function daftar_pelanggan() {
         if ($this->session->userdata('logged_in') == true) {
-            $data['judul'] = 'Daftar Pelanggan Baru';
-            $data['main_view'] = 'daftar_pelanggan_baru';
-            $data['pelanggan_baru'] = $this->UserModel->getAll('subscriber');
+            $data['judul'] = 'Daftar Pelanggan';
+            $data['main_view'] = 'daftar_pelanggan';
+            $data['pelanggan'] = $this->UserModel->getAll('subscriber');
             $this->load->view('template', $data);
         } else {
             $data['notif'] = 'Silahkan login terlebih dahulu';
@@ -528,6 +652,50 @@ class Dashboard extends CI_Controller {
                 $data['main_view'] = 'daftar_perangkat';
                 $data['perangkat'] = $this->UserModel
                     ->query('SELECT nama, email, device_id FROM akun NATURAL JOIN device;');
+                $this->load->view('template', $data);
+            }
+        } else {
+            $data['notif'] = "Silahkan login terlebih dahulu.";
+            $this->load->view('login', $data);
+        }
+    }
+
+    public function hapus_pesan() {
+        if ($this->session->userdata('logged_in') == true) {
+            $id_pesan = $this->input->get('id');
+            if ($this->UserModel->delete('pesan', 'id_pesan', $id_pesan) == true) {
+                $data['judul'] = 'Daftar Pesan';
+                $data['notifs'] = 'Hapus Berhasil';
+                $data['main_view'] = 'daftar_pesan';
+                $data['pesan'] = $this->UserModel->getAll('pesan');
+                $this->load->view('template', $data);
+            } else {
+                $data['judul'] = 'Daftar Pesan';
+                $data['notif'] = 'Hapus Gagal';
+                $data['main_view'] = 'daftar_pesan';
+                $data['pesan'] = $this->UserModel->getAll('pesan');
+                $this->load->view('template', $data);
+            }
+        } else {
+            $data['notif'] = "Silahkan login terlebih dahulu.";
+            $this->load->view('login', $data);
+        }
+    }
+
+    public function hapus_pelanggan() {
+        if ($this->session->userdata('logged_in') == true) {
+            $email = $this->input->get('email');
+            if ($this->UserModel->delete('subscriber', 'email', $email) == true) {
+                $data['judul'] = 'Daftar Pelanggan';
+                $data['notifs'] = 'Hapus Berhasil';
+                $data['main_view'] = 'daftar_pelanggan';
+                $data['pelanggan'] = $this->UserModel->getAll('subscriber');
+                $this->load->view('template', $data);
+            } else {
+                $data['judul'] = 'Daftar Pelanggan';
+                $data['notif'] = 'Hapus Gagal';
+                $data['main_view'] = 'daftar_pelanggan';
+                $data['pelanggan'] = $this->UserModel->getAll('subscriber');
                 $this->load->view('template', $data);
             }
         } else {
