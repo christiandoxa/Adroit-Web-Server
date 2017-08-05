@@ -151,7 +151,7 @@ bgcolor="#ffffff">
                             <table cellspacing="0" cellpadding="0" width="500" class="w320">
                                 <tr>
                                     <td valign="top" style="padding:10px 0; text-align:left;" class="mobile-center">
-                                    <img src="http://54.251.154.20/assets/main/images/logo-2.png">
+                                    <img src="' . base_url() . 'assets/main/images/logo-2.png">
                                     </td>
                                 </tr>
                             </table>
@@ -300,7 +300,7 @@ bgcolor="#ffffff">
                                         <tr>
                                             <td class="mobile-padding" style="text-align:left;">
                                                 <br>
-                                                Anda dapat menghubungi kami di <a href="http://54.251.154.20/#contact">link berikut</a> untuk
+                                                Anda dapat menghubungi kami di <a href="' . base_url() . '#contact">link berikut</a> untuk
                                                 segala pertanyaan mengenai produk
                                                 kami <br>
                                                 <br>
@@ -329,7 +329,7 @@ bgcolor="#ffffff">
                                                 <td style="text-align:center; margin:0 auto;" width="100%">
                                                     <a href="#" style="text-align:center;">
                                                         <img style="margin:0 auto;"
-                                                        src="http://54.251.154.20/assets/main/images/logo.png"/>
+                                                        src="' . base_url() . 'assets/main/images/logo.png"/>
                                                     </a>
                                                 </td>
                                             </tr>

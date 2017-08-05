@@ -77,7 +77,7 @@
 <section id="about" class="section">
     <div class="container">
         <div class="row">
-            <div class=" wow fadeInLeft">
+            <div class="col-md-7 col-sm-12 wow fadeInLeft">
                 <div class="sub-heading">
                     <h3>Lakukan aktivitas lebih mudah dan murah dengan Angkat.In</h3>
                 </div>
@@ -90,6 +90,52 @@
                     </p>
                 </div>
             </div>
+            <div class="col-md-5 col-sm-12 wow fadeInLeft" data-wow-delay="0.3s">
+                <div class="about-slider">
+                    <div class="init-slider owl-carousel owl-theme owl-loaded">
+                        <div class="about-item">
+                            <img src="<?php echo base_url() ?>assets/main/images/about/1.jpg" alt=""
+                                 class="img-responsive">
+                        </div>
+                        <div class="about-item">
+                            <img src="<?php echo base_url() ?>assets/main/images/about/2.jpg" alt=""
+                                 class="img-responsive">
+                        </div>
+                        <div class="about-item">
+                            <img src="<?php echo base_url() ?>assets/main/images/about/3.jpg" alt=""
+                                 class="img-responsive">
+                        </div>
+                        <div class="about-item">
+                            <img src="<?php echo base_url() ?>assets/main/images/about/4.jpg" alt=""
+                                 class="img-responsive">
+                        </div>
+                        <div class="about-item">
+                            <img src="<?php echo base_url() ?>assets/main/images/about/5.jpg" alt=""
+                                 class="img-responsive">
+                        </div>
+                        <div class="about-item">
+                            <img src="<?php echo base_url() ?>assets/main/images/about/6.jpg" alt=""
+                                 class="img-responsive">
+                        </div>
+                        <div class="about-item">
+                            <img src="<?php echo base_url() ?>assets/main/images/about/7.jpg" alt=""
+                                 class="img-responsive">
+                        </div>
+                        <div class="about-item">
+                            <img src="<?php echo base_url() ?>assets/main/images/about/8.jpg" alt=""
+                                 class="img-responsive">
+                        </div>
+                        <div class="about-item">
+                            <img src="<?php echo base_url() ?>assets/main/images/about/9.jpg" alt=""
+                                 class="img-responsive">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row wow fadeInLeft" style="margin-top: 50px">
+            <iframe style="display: block;margin: 0px auto" width="80%" height="500"
+                    src="https://www.youtube.com/embed/njjX9bYpSig?start=376" frameborder="0" allowfullscreen></iframe>
         </div>
     </div>
 </section><!-- #about close -->
@@ -290,6 +336,14 @@ Contact start
             } else {
                 $(".navbar-default").removeClass('animated');
             }
+        });
+
+        $('.init-slider').owlCarousel({
+            items: 1,
+            merge: true,
+            loop: true,
+            video: true,
+            smartSpeed: 600
         });
 
         /*$('input, textarea').data('holder', $('input, textarea').attr('placeholder'));
