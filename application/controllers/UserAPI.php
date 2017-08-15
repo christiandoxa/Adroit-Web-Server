@@ -85,11 +85,21 @@ class UserAPI extends REST_Controller
                 );
                 $stat = 1;
                 break;
-            default:
+            case "Off":
                 $data = array(
                     'status' => 'Off'
                 );
                 $stat = 0;
+                break;
+            case "Manual":
+                $data = array(
+                    'auto' => 'Manual'
+                );    
+                break;
+            case 'Otomatis':
+                $data = array(
+                    'auto' => 'Otomatis'
+                );
                 break;
         }
         /*$url = 'http://api.arkademy.com:3000/v0/arkana/device/IO/' . $id . '/gpio/control';
