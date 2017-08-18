@@ -9,8 +9,8 @@ class UserAPI extends REST_Controller
         $this->load->model('GenerateToken');
     }
 
-    const SUCCESS = 'success';
-    const FAIL = 'fail';
+    const SUCCESS = true;
+    const FAIL = false;
 
     public function index_get()
     {
@@ -110,8 +110,9 @@ class UserAPI extends REST_Controller
                 "13" => $stat
             )
         );*/
-        $update = $this->db->where('device_id', $id)->update('device', $data);
-        if ($update) {
+        $this->db->where('device_id', $id)->update('device', $data);
+        // $this->response(array('status' => self::SUCCESS, 'row' => $this->db->affected_rows()), 200);
+        if ($this->db->affected_rows() > 0) {
             $this->response(array('status' => self::SUCCESS), 200);
         } else {
             $this->response(array('status' => self::FAIL), 502);
