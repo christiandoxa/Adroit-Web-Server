@@ -87,7 +87,9 @@ class UserAPI extends REST_Controller
                 break;
             case "Off":
                 $data = array(
-                    'status' => 'Off'
+                    'status' => 'Off',
+                    'servo' => 'Angkat',
+                    'auto' => 'Manual'
                 );
                 $stat = 0;
                 break;
