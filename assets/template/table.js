@@ -38,3 +38,11 @@ $(document).ready(function () {
         responsive: true
     });
 });
+
+$(document).ready(function () {
+    $('#dataTables-daftarPerangkat').DataTable({
+        "aoColumnDefs": [{"bSortable": false, "aTargets": [7]},
+            {"bSearchable": false, "aTargets": [7]}],
+        responsive: true
+    });
+});

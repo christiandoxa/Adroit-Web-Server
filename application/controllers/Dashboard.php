@@ -389,7 +389,7 @@ class Dashboard extends CI_Controller {
             $data['judul'] = 'Daftar Perangkat';
             $data['main_view'] = 'daftar_perangkat';
             $data['perangkat'] = $this->UserModel
-                ->query('SELECT nama, email, device_id FROM akun NATURAL JOIN device;');
+                ->query('SELECT * FROM akun NATURAL JOIN device;');
             $this->load->view('template', $data);
         } else {
             $data['notif'] = "Silahkan login terlebih dahulu.";
