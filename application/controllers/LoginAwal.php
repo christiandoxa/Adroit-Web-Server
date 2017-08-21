@@ -66,7 +66,7 @@ class LoginAwal extends CI_Controller
         } else {
             $data = array(
                 'email' => $email,
-                'kata_sandi' => $password,
+                'kata_sandi' => sha1($password),
                 'nama' => $nama,
                 'token' => $token
             );
