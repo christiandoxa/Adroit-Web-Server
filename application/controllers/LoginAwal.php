@@ -14,21 +14,13 @@ class LoginAwal extends CI_Controller
 
     public function index()
     {
-        $email = $this->input->post('email');
+        $email = base64_decode($this->input->post('email'));
         $password = base64_decode($this->input->post('password'));
 
         $query = $this->db->where('email', $email)->where('kata_sandi', sha1($password))->get('akun');
         if ($query->num_rows() > 0) {
-            $token = $this->GenerateToken->getHash($email, $password);
-            $data = array(
-                'token' => $token
-            );
-            $query_update = $this->db->where('email', $email)->where('kata_sandi', sha1($password))->update('akun', $data);
-            if ($query_update) {
-                echo json_encode(array('status' => self::SUCCESS, 'token' => $token));
-            } else {
-                echo json_encode(array('status' => self::FAIL));
-            }
+            $token = $query->row()->token;
+            echo json_encode(array('status' => self::SUCCESS, 'token' => $token));
         } else {
             echo json_encode(array('status' => self::FAIL));
         }
@@ -39,20 +31,13 @@ class LoginAwal extends CI_Controller
         $email = base64_decode($this->input->post('email'));
         $name = base64_decode($this->input->post('name'));
         $password = $this->GenerateToken->getPass();
-        $token = $this->GenerateToken->getHash($email, $password);
 
-        $query = $this->db->where('email', $email)->get('akun');
+        $query = $this->db->where('email', $email)->get('akun')->row();
         if ($query->num_rows() > 0) {
-            $data = array(
-                'token' => $token
-            );
-            $query_update = $this->db->where('email', $email)->update('akun', $data);
-            if ($query_update) {
-                echo json_encode(array('status' => self::SUCCESS, 'token' => $token));
-            } else {
-                echo json_encode(array('status' => self::FAIL));
-            }
+            $token  = $query->token;
+            echo json_encode(array('status' => self::SUCCESS, 'token' => $token));
         } else {
+            $token = $this->GenerateToken->getHash($email, $password);
             $data = array(
                 'token' => $token,
                 'email' => $email,
@@ -73,6 +58,7 @@ class LoginAwal extends CI_Controller
         $email = base64_decode($this->input->post('email'));
         $nama = base64_decode($this->input->post('name'));
         $password = base64_decode($this->input->post('password'));
+        $token = $this->GenerateToken->getHash($email, $password);
 
         $query = $this->db->where('email', $email)->get('akun');
         if ($query->num_rows() > 0) {
@@ -81,7 +67,8 @@ class LoginAwal extends CI_Controller
             $data = array(
                 'email' => $email,
                 'kata_sandi' => $password,
-                'nama' => $nama
+                'nama' => $nama,
+                'token' => $token
             );
             $this->db->insert('akun', $data);
             if ($this->db->affected_rows() > 0) {
