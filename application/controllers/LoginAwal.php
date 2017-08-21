@@ -32,9 +32,9 @@ class LoginAwal extends CI_Controller
         $name = base64_decode($this->input->post('name'));
         $password = $this->GenerateToken->getPass();
 
-        $query = $this->db->where('email', $email)->get('akun')->row();
+        $query = $this->db->where('email', $email)->get('akun');
         if ($query->num_rows() > 0) {
-            $token  = $query->token;
+            $token  = $query->row()->token;
             echo json_encode(array('status' => self::SUCCESS, 'token' => $token));
         } else {
             $token = $this->GenerateToken->getHash($email, $password);
