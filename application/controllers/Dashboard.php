@@ -372,6 +372,18 @@ class Dashboard extends CI_Controller {
         }
     }
 
+    public function daftar_riwayat_jemur() {
+        if ($this->session->userdata('logged_in') == true) {
+            $data['judul'] = 'Daftar Riwayat Jemur';
+            $data['main_view'] = 'daftar_riwayat_jemur';
+            $data['jemur'] = $this->UserModel->getAll('jemur');
+            $this->load->view('template', $data);
+        } else {
+            $data['notif'] = 'Silahkan login terlebih dahulu';
+            $this->load->view('login', $data);
+        }
+    }
+
     public function daftar_pengguna() {
         if ($this->session->userdata('logged_in') == true) {
             $data['judul'] = 'Daftar Pengguna';
@@ -607,6 +619,28 @@ class Dashboard extends CI_Controller {
                     $data['pengguna'] = $this->UserModel->getAll('akun');
                     $this->load->view('template', $data);
                 }
+            }
+        } else {
+            $data['notif'] = "Silahkan login terlebih dahulu.";
+            $this->load->view('login', $data);
+        }
+    }
+
+    public function hapus_riwayat_jemur() {
+        if ($this->session->userdata('logged_in') == true) {
+            $id = $this->input->get('id');
+            if ($this->UserModel->delete('jemur', 'id_jemuran', $id) == true) {
+                $data['judul'] = 'Daftar Riwayat Jemur';
+                $data['notifs'] = 'Hapus Berhasil';
+                $data['main_view'] = 'daftar_riwayat_jemur';
+                $data['jemur'] = $this->UserModel->getAll('jemur');
+                $this->load->view('template', $data);
+            } else {
+                $data['judul'] = 'Daftar Riwayat Jemur';
+                $data['notif'] = 'Hapus Gagal';
+                $data['main_view'] = 'daftar_riwayat_jemur';
+                $data['jemur'] = $this->UserModel->getAll('jemur');
+                $this->load->view('template', $data);
             }
         } else {
             $data['notif'] = "Silahkan login terlebih dahulu.";

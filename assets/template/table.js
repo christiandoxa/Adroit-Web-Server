@@ -32,6 +32,15 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+    $('#dataTables-jemur').DataTable({
+        "aoColumnDefs": [{"bSortable": false, "aTargets": [5, 6]},
+            {"bSearchable": false, "aTargets": [5, 6]}],
+        order: [[3, 'desc']],
+        responsive: true
+    });
+});
+
+$(document).ready(function () {
     $('#dataTables-pelanggan-baru').DataTable({
         "aoColumnDefs": [{"bSortable": false, "aTargets": [3, 4]},
             {"bSearchable": false, "aTargets": [3, 4]}],
