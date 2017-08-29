@@ -1,4 +1,5 @@
 var db = require("../database/model");
+var dbCon = require("../database/connection");
 var hashToSHA1 = require("sha1");
 var generateToken = require("../database/GenerateToken");
 var async = require('async');
@@ -20,15 +21,30 @@ const SUCCESS = true;
 const FAIL = false;
 
 function API(){
-  this.findToken = function(token, cb) {
+  this.findToken = function(token, callback) {
+    dbCon.init();
     process.nextTick(function() {
-      db.que('SELECT token FROM akun WHERE token = ?',token,function(err,data){
+      dbCon.acquire(function(err,con){
         if(err){
-          return cb(err, null);
+          console.log(err);
+          return callback(null, null);
         }else{
-          return cb(null, data[0].token);
+          con.query('SELECT token FROM akun WHERE token = ?',token,function(err,data){
+            con.release();
+            if(err){
+              return callback(err, null);
+            }else if(data.length > 0){
+              if(data){
+                return callback(null, data);
+              }else{
+                return callback(null, null);
+              }
+            }else{
+              return callback(null, null);
+            }
+          });
         }
-      });
+      })
     });
   };
 
