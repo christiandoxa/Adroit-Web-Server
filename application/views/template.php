@@ -106,6 +106,10 @@
                                     class="fa fa-users fa-fw"></i> Daftar Pelanggan</a>
                     </li>
                     <li>
+                        <a href="<?php echo base_url('dashboard/daftar_riwayat_jemur') ?>"><i
+                                    class="fa fa-list fa-fw"></i> Daftar Riwayat Jemur</a>
+                    </li>
+                    <li>
                         <a href="<?php echo base_url('dashboard/broadcast_email_pengguna') ?>"><i
                                     class="fa fa-bullhorn fa-fw"></i> Broadcast Email Pengguna</a>
                     </li>
