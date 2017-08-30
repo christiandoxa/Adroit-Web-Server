@@ -171,6 +171,8 @@ function API(){
             res.status(200).json({status:SUCCESS});
           }
         });
+      }else{
+        res.status(400).json({status:FAIL,result:'params not found'});
       }
     }else{
       res.status(400).json({status:FAIL,result:'params not found'});
