@@ -20,6 +20,7 @@ router.get('/device/(:id)?',passport.authenticate('bearer',{session: false}),use
 router.get('/profile',passport.authenticate('bearer',{session: false}),user.profile);
 router.put('/update',passport.authenticate('bearer',{session: false}),user.updateDevice);
 router.get('/login',passport.authenticate('bearer',{session: false}),user.login);
+router.get('/history',passport.authenticate('bearer',{session: false}),user.jemuranGet);
 router.post('/login',user.loginAwal);
 router.post('/SignUp',user.signUp);
 router.post('/login/withGmail',user.withGmail);

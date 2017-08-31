@@ -162,7 +162,7 @@ function API(){
       if(sql){
         db.que("UPDATE device SET "+sql+"WHERE device_id = ?",id,function(err,data){
           if(err){
-            if(data.affectedRows == 1){
+            if(err == 'other'){
               res.status(200).json({status:SUCCESS});
             }else{
               res.status(400).json({status:FAIL,result:err});
@@ -184,10 +184,10 @@ function API(){
     var nama = base64_decode(req.body.name);
     var password = hashToSHA1(base64_decode(req.body.password));
     if(email && nama && password){
-      var tok = generateToken.getToken(email,password);
+      var tok = generateToken.getToken(email,base64_decode(req.body.password));
       db.que('INSERT INTO akun (email,nama,kata_sandi,token) VALUES (?,?,?,?)',[email,nama,password,tok],function(err,data){
         if(err){
-          if(data.affectedRows > 0){
+          if(err == 'other'){
             res.status(200).json({status:SUCCESS});
           }else{
             res.status(400).json({status:FAIL,result:err});
@@ -201,12 +201,45 @@ function API(){
     }
   };
 
-  this.profile = function(req,res){
+  this.jemuranGet = function(req,res){
     var tok = req.headers.authorization;
-    var tokimay = tok.substring(7,tok.length);
+    var token = tok.substring(7,tok.length);
     async.waterfall([
       function(callback){
-        db.que('SELECT * FROM akun WHERE token = ?',tokimay,function(err,data){
+        db.que('SELECT * FROM akun WHERE token = ?',token,function(err,data){
+          if(err){
+            callback(err,null);
+          }else{
+            callback(err,data[0].email);
+          }
+        });
+      },
+      function(email,callback){
+        db.que('SELECT * FROM jemur WHERE email = ?',email,function(err,data){
+          if(err){
+            callback(err,null);
+          }else{
+            callback(null,data);
+          }
+        });
+      }
+    ],function(err,data){
+      if(err){
+        res.status(400).json({status:FAIL,result:err});
+      }else{
+        res.status(200).json({status:SUCCESS,result:data});
+      }
+    });
+  };
+
+  
+
+  this.profile = function(req,res){
+    var tok = req.headers.authorization;
+    var token = tok.substring(7,tok.length);
+    async.waterfall([
+      function(callback){
+        db.que('SELECT * FROM akun WHERE token = ?',token,function(err,data){
           if(err){
             callback(err,null);
           }else{
