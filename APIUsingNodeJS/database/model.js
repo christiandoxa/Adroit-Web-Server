@@ -21,6 +21,32 @@ function Model(){
         });
       }
     });
-  }
+  };
+
+  this.findToken = function(token, callback) {
+    process.nextTick(function() {
+      connection.acquire(function(err,con){
+        if(err){
+          console.log(err);
+          return callback(null, null);
+        }else{
+          con.query('SELECT token FROM akun WHERE token = ?',token,function(err,data){
+            con.release();
+            if(err){
+              return callback(err, null);
+            }else if(data.length > 0){
+              if(data){
+                return callback(null, data);
+              }else{
+                return callback(null, null);
+              }
+            }else{
+              return callback(null, null);
+            }
+          });
+        }
+      })
+    });
+  };
 };
 module.exports = new Model();

@@ -1,12 +1,13 @@
 var express = require('express');
 var user = require("../api/user");
+var db = require("../database/model");
 var passport = require('passport');
 var Strategy = require('passport-http-bearer').Strategy;
 var router = express.Router();
 
 passport.use(new Strategy(
   function(token, cb) {
-    user.findToken(token, function(err, data) {
+    db.findToken(token, function(err, data) {
       if (err) { return cb(err); }
       if (!data) { return cb(null, false); }
       return cb(null, data);
@@ -21,6 +22,7 @@ router.get('/profile',passport.authenticate('bearer',{session: false}),user.prof
 router.put('/update',passport.authenticate('bearer',{session: false}),user.updateDevice);
 router.get('/login',passport.authenticate('bearer',{session: false}),user.login);
 router.get('/history',passport.authenticate('bearer',{session: false}),user.jemuranGet);
+router.post('/history',passport.authenticate('bearer',{session: false}),user.jemuranPost);
 router.post('/login',user.loginAwal);
 router.post('/SignUp',user.signUp);
 router.post('/login/withGmail',user.withGmail);

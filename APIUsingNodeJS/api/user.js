@@ -3,6 +3,7 @@ var dbCon = require("../database/connection");
 var hashToSHA1 = require("sha1");
 var generateToken = require("../database/GenerateToken");
 var async = require('async');
+var dateFormat = require('dateformat');
 var base64_encode = function(val){
   var encode = null;
   if(val){
@@ -21,33 +22,6 @@ const SUCCESS = true;
 const FAIL = false;
 
 function API(){
-  this.findToken = function(token, callback) {
-    dbCon.init();
-    process.nextTick(function() {
-      dbCon.acquire(function(err,con){
-        if(err){
-          console.log(err);
-          return callback(null, null);
-        }else{
-          con.query('SELECT token FROM akun WHERE token = ?',token,function(err,data){
-            con.release();
-            if(err){
-              return callback(err, null);
-            }else if(data.length > 0){
-              if(data){
-                return callback(null, data);
-              }else{
-                return callback(null, null);
-              }
-            }else{
-              return callback(null, null);
-            }
-          });
-        }
-      })
-    });
-  };
-
   this.getDevice = function(req,res){
     var id_device = req.params.id;
     if(id_device){
@@ -232,7 +206,45 @@ function API(){
     });
   };
 
-  
+  this.jemuranPost = function(req,res){
+    var tok = req.headers.authorization;
+    var token = tok.substring(7,tok.length);
+    var date = new Date(req.body.date);
+    var tglJemur = dateFormat(date,"dd-mm-yyyy");
+    var time = "13";
+    var id_device = req.body.id;
+    var id_jemuran = dateFormat(date,"ssMMHHddmmyyyy");
+    async.waterfall([
+      function(callback){
+        db.que("SELECT email FROM akun WHERE token = ?",token,function(err,data){
+          if(err){
+            callback(err,null);
+          }else{
+            callback(null,data[0].email);
+          }
+        });
+      },
+      function(email,callback){
+        db.que("INSERT INTO jemur (id_jemuran,device_id,tanggal_jemur,estimasi_waktu,email) VALUES (?,?,?,?,?)",[id_jemuran,id_device,tglJemur,time,email],function(err,data){
+          if(err){
+            callback(err,null);
+          }else{
+            callback(null,data);
+          }
+        });
+      }
+    ],function(err,data){
+      if(err){
+        if(err=="other"){
+          res.status(200).json({status:SUCCESS});
+        }else{
+          res.status(400).json({status:FAIL,result:err});
+        }
+      }else{
+        res.status(200).json({status:SUCCESS});
+      }
+    });
+  };
 
   this.profile = function(req,res){
     var tok = req.headers.authorization;
