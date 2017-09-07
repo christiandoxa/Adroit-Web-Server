@@ -210,7 +210,7 @@ function API(){
     var tok = req.headers.authorization;
     var token = tok.substring(7,tok.length);
     var date = new Date(req.body.date);
-    var tglJemur = dateFormat(date,"dd-mm-yyyy");
+    var tglJemur = dateFormat(date,"dddd, dd mmmm yyyy");
     var time = "13";
     var id_device = req.body.id;
     var id_jemuran = dateFormat(date,"ssMMHHddmmyyyy");
@@ -262,17 +262,34 @@ function API(){
       function(dataUser,callback){
         db.que('SELECT * FROM device WHERE email = ?',dataUser.email,function(err,data){
           if(err){
-            callback(err,null,null);
+            if(err=="other"){
+              callback(null,dataUser,null);
+            }else{
+              callback(err,null,null);
+            }
           }else{
             callback(null,dataUser,data);
           }
         });
+      },
+      function(dataUser,dataDevice,callback){
+        db.que('SELECT * FROM jemur WHERE email = ?',dataUser.email,function(err,data){
+          if(err){
+            if(err=="other"){
+              callback(null,dataUser,dataDevice,null);
+            }else{
+              callback(err,null,null,null);
+            }
+          }else{
+            callback(null,dataUser,dataDevice,data);
+          }
+        });
       }
-    ],function(err,resultUser,resultDevice){
+    ],function(err,resultUser,resultDevice,resultRiwayat){
       if(err){
         res.status(400).json({status:FAIL,result:err});
       }else{
-        res.status(200).json({status:SUCCESS,result:{profile:resultUser,devices:resultDevice}});
+        res.status(200).json({status:SUCCESS,result:{profile:resultUser,devices:resultDevice,riwayat:resultRiwayat}});
       }
     });
   };
