@@ -4,6 +4,7 @@ var hashToSHA1 = require("sha1");
 var generateToken = require("../database/GenerateToken");
 var async = require('async');
 var dateFormat = require('dateformat');
+var cron = require('../api/cron');
 var base64_encode = function(val){
   var encode = null;
   if(val){
@@ -22,6 +23,8 @@ const SUCCESS = true;
 const FAIL = false;
 
 function API(){
+  // cron.init(db);
+
   this.getDevice = function(req,res){
     var id_device = req.params.id;
     if(id_device){
@@ -40,12 +43,36 @@ function API(){
   this.loginAwal = function(req,res){
     var email = base64_decode(req.body.email);
     var pass = base64_decode(req.body.password);
+    var regToken = req.body.regToken;
     if(email && pass){
-      db.que('SELECT * FROM akun WHERE email = ? AND kata_sandi = ?',[email,hashToSHA1(pass)],function(err,data){
+      async.waterfall([
+        function(callback){
+          db.que('SELECT token FROM akun WHERE email = ? AND kata_sandi = ?',[email,hashToSHA1(pass)],function(err,data){
+            if(err){
+              callback(err,null);
+            }else{
+              callback(null,data[0].token);
+            }
+          });
+        },
+        function(token,callback){
+          db.que('UPDATE akun SET regToken = ? WHERE email = ? AND kata_sandi = ?',[regToken,email,hashToSHA1(pass)],function(err,data){
+            if(err){
+              if(err == 'other'){
+                callback(null,token)
+              }else{
+                callback(err,token);
+              }
+            }else{
+              callback(null,token);
+            }
+          });
+        }
+      ],function(err,token){
         if(err){
           res.status(400).json({status:FAIL,result:err});
         }else{
-          res.status(200).json({status:SUCCESS,result:{token:data[0].token}});
+          res.status(200).json({status:SUCCESS,result:{token:token}});
         }
       });
     }else{
@@ -57,15 +84,31 @@ function API(){
     res.status(200).json({status:SUCCESS});
   };
 
-  this.withGmail = function(req,res){
-    var email = base64_decode(req.body.email);
-    var nama = base64_decode(req.body.name);
-    var password = generateToken.getPass();
+  this.logout = function(req,res){
+    let tok = req.headers.authorization;
+    let token = tok.substring(7,tok.length);
+    db.que('UPDATE akun SET regToken = "" WHERE token = ?',token,function(err,data){
+      if(err){
+        if(err=="other"){
+          res.status(200).json({status:SUCCESS});
+        }else{
+          res.status(400).json({status:FAIL});
+        }
+      }else{
+        res.status(200).json({status:SUCCESS});
+      }
+    });
+  }
 
+  this.withGmail = function(req,res){
+    let email = base64_decode(req.body.email);
+    let nama = base64_decode(req.body.name);
+    let password = generateToken.getPass();
+    let regToken = req.body.regToken;
     if(email && nama){
       async.waterfall([
         function(callback){
-          db.que('SELECT * FROM akun WHERE email = ?',email,function(err,data){
+          db.que('SELECT token FROM akun WHERE email = ?',email,function(err,data){
             if(err){
               if(err=='other'){
                 callback(null,true,null);
@@ -79,8 +122,8 @@ function API(){
         },
         function(insert,dataToken,callback){
           if(insert){
-            var tok = generateToken.getToken(email,password);
-            db.que('INSERT INTO akun (email,nama,kata_sandi,token) VALUES (?,?,?,?)',[email,nama,password,tok],function(err,data){
+            let tok = generateToken.getToken(email,password);
+            db.que('INSERT INTO akun (email,nama,kata_sandi,token,regToken) VALUES (?,?,?,?,?)',[email,nama,password,tok,regToken],function(err,data){
               if(err){
                 if(data.affectedRows > 0){
                   callback(null,SUCCESS,tok);
@@ -108,9 +151,9 @@ function API(){
   };
 
   this.updateDevice = function(req,res){
-    var id = req.body.id;
-    var job = req.body.job;
-    var sql = null;
+    let id = req.body.id;
+    let job = req.body.job;
+    let sql = null;
     if(id && job){
       switch (job) {
         case "angkat":
@@ -134,7 +177,7 @@ function API(){
       }
 
       if(sql){
-        db.que("UPDATE device SET "+sql+"WHERE device_id = ?",id,function(err,data){
+        db.que("UPDATE device SET "+sql+" WHERE device_id = ?",id,function(err,data){
           if(err){
             if(err == 'other'){
               res.status(200).json({status:SUCCESS});
@@ -154,11 +197,11 @@ function API(){
   };
 
   this.signUp = function(req,res){
-    var email = base64_decode(req.body.email);
-    var nama = base64_decode(req.body.name);
-    var password = hashToSHA1(base64_decode(req.body.password));
+    let email = base64_decode(req.body.email);
+    let nama = base64_decode(req.body.name);
+    let password = hashToSHA1(base64_decode(req.body.password));
     if(email && nama && password){
-      var tok = generateToken.getToken(email,base64_decode(req.body.password));
+      let tok = generateToken.getToken(email,base64_decode(req.body.password));
       db.que('INSERT INTO akun (email,nama,kata_sandi,token) VALUES (?,?,?,?)',[email,nama,password,tok],function(err,data){
         if(err){
           if(err == 'other'){
@@ -176,11 +219,11 @@ function API(){
   };
 
   this.jemuranGet = function(req,res){
-    var tok = req.headers.authorization;
-    var token = tok.substring(7,tok.length);
+    let tok = req.headers.authorization;
+    let token = tok.substring(7,tok.length);
     async.waterfall([
       function(callback){
-        db.que('SELECT * FROM akun WHERE token = ?',token,function(err,data){
+        db.que('SELECT email FROM akun WHERE token = ?',token,function(err,data){
           if(err){
             callback(err,null);
           }else{
@@ -189,7 +232,7 @@ function API(){
         });
       },
       function(email,callback){
-        db.que('SELECT * FROM jemur WHERE email = ?',email,function(err,data){
+        db.que('SELECT *,DATE_ADD(tanggal_jemur, INTERVAL estimasi_waktu SECOND) AS tgl_selesai FROM jemur WHERE email = ?',email,function(err,data){
           if(err){
             callback(err,null);
           }else{
@@ -206,36 +249,72 @@ function API(){
     });
   };
 
-  this.jemuranPost = function(req,res){
-    var tok = req.headers.authorization;
-    var token = tok.substring(7,tok.length);
-    var date = new Date(req.body.date);
-    var tglJemur = dateFormat(date,"dddd, dd mmmm yyyy");
-    var time = "13";
-    var id_device = req.body.id;
-    var id_jemuran = dateFormat(date,"ssMMHHddmmyyyy");
-    async.waterfall([
-      function(callback){
-        db.que("SELECT email FROM akun WHERE token = ?",token,function(err,data){
-          if(err){
-            callback(err,null);
-          }else{
-            callback(null,data[0].email);
-          }
-        });
-      },
-      function(email,callback){
-        db.que("INSERT INTO jemur (id_jemuran,device_id,tanggal_jemur,estimasi_waktu,email) VALUES (?,?,?,?,?)",[id_jemuran,id_device,tglJemur,time,email],function(err,data){
-          if(err){
-            callback(err,null);
-          }else{
-            callback(null,data);
-          }
-        });
-      }
-    ],function(err,data){
+  this.jemuranUpdate = function(req,res){
+    let id_jemuran = req.body.id;
+    db.que("UPDATE jemur SET status = 'sudah kering' WHERE id_jemuran = ?",id_jemuran,function(err,data){
       if(err){
         if(err=="other"){
+          res.status(200).json({status:SUCCESS});
+        }else{
+          res.status(400).json({status:FAIL});
+        }
+      }else{
+        res.status(200).json({status:SUCCESS});
+      }
+    });
+  };
+
+  this.jemuranPost = function(req,res){
+    let tok = req.headers.authorization;
+    let token = tok.substring(7,tok.length);
+    let date = new Date(req.body.date);
+    let tgl_jemur = dateFormat(date,"yyyy-mm-dd'T'HH:MM:ss'Z'");
+    let time = "5400";
+    let id_device = req.body.id;
+    let id_jemuran = dateFormat(date,"ssMMHHddmmyyyy");
+    if(date && id_device){
+      async.waterfall([
+        function(callback){
+          db.que("SELECT email FROM akun WHERE token = ?",token,function(err,data){
+            if(err){
+              callback(err,null);
+            }else{
+              callback(null,data[0].email);
+            }
+          });
+        },
+        function(email,callback){
+          db.que("INSERT INTO jemur (id_jemuran,device_id,tanggal_jemur,estimasi_waktu,email) VALUES (?,?,?,?,?)",[id_jemuran,id_device,tgl_jemur,time,email],function(err,data){
+            if(err){
+              callback(err,null);
+            }else{
+              callback(null,data);
+            }
+          });
+        }
+      ],function(err,data){
+        if(err){
+          if(err=="other"){
+            res.status(200).json({status:SUCCESS});
+          }else{
+            res.status(400).json({status:FAIL,result:err});
+          }
+        }else{
+          res.status(200).json({status:SUCCESS});
+        }
+      });
+    }else{
+      res.status(400).json({status:FAIL,result:'params not found'});
+    }
+  };
+
+  this.profileUpdate = function(req,res){
+    let tok = req.headers.authorization;
+    let token = tok.substring(7,tok.length);
+    let regToken = req.body.regToken;
+    db.que('UPDATE akun set regToken = ? WHERE token = ?',[regToken,token],function(err,data){
+      if(err){
+        if(err == 'other'){
           res.status(200).json({status:SUCCESS});
         }else{
           res.status(400).json({status:FAIL,result:err});
@@ -247,11 +326,11 @@ function API(){
   };
 
   this.profile = function(req,res){
-    var tok = req.headers.authorization;
-    var token = tok.substring(7,tok.length);
+    let tok = req.headers.authorization;
+    let token = tok.substring(7,tok.length);
     async.waterfall([
       function(callback){
-        db.que('SELECT * FROM akun WHERE token = ?',token,function(err,data){
+        db.que('SELECT email,nama FROM akun WHERE token = ?',token,function(err,data){
           if(err){
             callback(err,null);
           }else{

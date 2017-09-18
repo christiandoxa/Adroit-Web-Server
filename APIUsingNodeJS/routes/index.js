@@ -19,9 +19,12 @@ router.get('/', function(req, res, next) {
 });
 router.get('/device/(:id)?',passport.authenticate('bearer',{session: false}),user.getDevice);
 router.get('/profile',passport.authenticate('bearer',{session: false}),user.profile);
+router.put('/profile',passport.authenticate('bearer',{session: false}),user.profileUpdate);
 router.put('/update',passport.authenticate('bearer',{session: false}),user.updateDevice);
 router.get('/login',passport.authenticate('bearer',{session: false}),user.login);
 router.get('/history',passport.authenticate('bearer',{session: false}),user.jemuranGet);
+router.put('/history',passport.authenticate('bearer',{session: false}),user.jemuranUpdate);
+router.get('/logout',passport.authenticate('bearer',{session: false}),user.logout);
 router.post('/history',passport.authenticate('bearer',{session: false}),user.jemuranPost);
 router.post('/login',user.loginAwal);
 router.post('/SignUp',user.signUp);
