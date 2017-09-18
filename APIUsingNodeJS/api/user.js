@@ -172,7 +172,7 @@ function API(){
           sql = "auto = 'Manual'";
           break;
         case "Otomatis":
-          sql = "auto = 'Otomatis'";
+          sql = "auto = 'Otomatis', servo = 'Angkat'";
           break;
       }
 
