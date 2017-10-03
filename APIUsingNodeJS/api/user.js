@@ -1,5 +1,4 @@
 var db = require("../database/model");
-var dbCon = require("../database/connection");
 var hashToSHA1 = require("sha1");
 var generateToken = require("../database/GenerateToken");
 var async = require('async');
@@ -23,7 +22,7 @@ const SUCCESS = true;
 const FAIL = false;
 
 function API(){
-  // cron.init(db);
+  cron.init(db);
 
   this.getDevice = function(req,res){
     var id_device = req.params.id;
@@ -125,7 +124,7 @@ function API(){
             let tok = generateToken.getToken(email,password);
             db.que('INSERT INTO akun (email,nama,kata_sandi,token,regToken) VALUES (?,?,?,?,?)',[email,nama,password,tok,regToken],function(err,data){
               if(err){
-                if(data.affectedRows > 0){
+                if(err == 'other'){
                   callback(null,SUCCESS,tok);
                 }else{
                   callback(err,null,null);
@@ -203,12 +202,12 @@ function API(){
     if(email && nama && password){
       let tok = generateToken.getToken(email,base64_decode(req.body.password));
       db.que('INSERT INTO akun (email,nama,kata_sandi,token) VALUES (?,?,?,?)',[email,nama,password,tok],function(err,data){
+        if(err == 'other'){
+          res.status(200).json({status:SUCCESS});
+        }else{
+          res.status(400).json({status:FAIL,result:err});
+        }
         if(err){
-          if(err == 'other'){
-            res.status(200).json({status:SUCCESS});
-          }else{
-            res.status(400).json({status:FAIL,result:err});
-          }
         }else{
           res.status(200).json({status:SUCCESS});
         }
@@ -269,9 +268,10 @@ function API(){
     let token = tok.substring(7,tok.length);
     let date = new Date(req.body.date);
     let tgl_jemur = dateFormat(date,"yyyy-mm-dd'T'HH:MM:ss'Z'");
-    let time = "5400";
+    let timeNumber = 3600*2;
+    let timeString = parseInt(timeNumber,10);
     let id_device = req.body.id;
-    let id_jemuran = dateFormat(date,"ssMMHHddmmyyyy");
+    let id_jemuran = dateFormat(date,"yyyymmddHHMMss");
     if(date && id_device){
       async.waterfall([
         function(callback){
@@ -283,22 +283,35 @@ function API(){
             }
           });
         },
-        function(email,callback){
-          db.que("INSERT INTO jemur (id_jemuran,device_id,tanggal_jemur,estimasi_waktu,email) VALUES (?,?,?,?,?)",[id_jemuran,id_device,tgl_jemur,time,email],function(err,data){
+		function (email,callback) {
+			db.que('SELECT cahaya,hujan,lembab FROM device WHERE device_id = ?',id_device,function (err, data) {
+				if(err){
+					if(err == 'other'){
+						callback("device not found",null);
+					}else {
+						callback(err,null);
+					}
+				}else {
+					callback(null,data,email);
+				}
+			})
+		},
+        function(dataDevice,email,callback){
+          db.que("INSERT INTO jemur (id_jemuran,device_id,tanggal_jemur,estimasi_waktu,cahaya,hujan,lembab,email) VALUES (?,?,?,?,?,?,?,?)",[id_jemuran,id_device,tgl_jemur,timeString,dataDevice[0].cahaya,dataDevice[0].hujan,dataDevice[0].lembab,email],function(err,data){
             if(err){
-              callback(err,null);
+              if(err == 'other'){
+                callback(null);
+              }else{
+                callback(err);
+              }
             }else{
-              callback(null,data);
+              callback(null);
             }
           });
         }
-      ],function(err,data){
+      ],function(err){
         if(err){
-          if(err=="other"){
-            res.status(200).json({status:SUCCESS});
-          }else{
-            res.status(400).json({status:FAIL,result:err});
-          }
+			res.status(400).json({status:FAIL,result:err});
         }else{
           res.status(200).json({status:SUCCESS});
         }
