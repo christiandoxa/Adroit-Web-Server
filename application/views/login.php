@@ -10,7 +10,7 @@
     <meta name="author" content="">
 
     <title>Login Admin Web Server Adroit</title>
-
+    <link rel="icon" href="<?php echo base_url('assets/main/') ?>images/favicon.png">
     <!-- Bootstrap Core CSS -->
     <link href="<?php echo base_url() ?>assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
