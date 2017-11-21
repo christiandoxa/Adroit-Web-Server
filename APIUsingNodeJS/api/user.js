@@ -1,8 +1,9 @@
 var db = require("../database/model");
-var dbCon = require("../database/connection");
 var hashToSHA1 = require("sha1");
 var generateToken = require("../database/GenerateToken");
 var async = require('async');
+var dateFormat = require('dateformat');
+var cron = require('../api/cron');
 var base64_encode = function(val){
   var encode = null;
   if(val){
@@ -21,32 +22,7 @@ const SUCCESS = true;
 const FAIL = false;
 
 function API(){
-  this.findToken = function(token, callback) {
-    dbCon.init();
-    process.nextTick(function() {
-      dbCon.acquire(function(err,con){
-        if(err){
-          console.log(err);
-          return callback(null, null);
-        }else{
-          con.query('SELECT token FROM akun WHERE token = ?',token,function(err,data){
-            con.release();
-            if(err){
-              return callback(err, null);
-            }else if(data.length > 0){
-              if(data){
-                return callback(null, data);
-              }else{
-                return callback(null, null);
-              }
-            }else{
-              return callback(null, null);
-            }
-          });
-        }
-      })
-    });
-  };
+  cron.init(db);
 
   this.getDevice = function(req,res){
     var id_device = req.params.id;
@@ -66,12 +42,36 @@ function API(){
   this.loginAwal = function(req,res){
     var email = base64_decode(req.body.email);
     var pass = base64_decode(req.body.password);
+    var regToken = req.body.regToken;
     if(email && pass){
-      db.que('SELECT * FROM akun WHERE email = ? AND kata_sandi = ?',[email,hashToSHA1(pass)],function(err,data){
+      async.waterfall([
+        function(callback){
+          db.que('SELECT token FROM akun WHERE email = ? AND kata_sandi = ?',[email,hashToSHA1(pass)],function(err,data){
+            if(err){
+              callback(err,null);
+            }else{
+              callback(null,data[0].token);
+            }
+          });
+        },
+        function(token,callback){
+          db.que('UPDATE akun SET regToken = ? WHERE email = ? AND kata_sandi = ?',[regToken,email,hashToSHA1(pass)],function(err,data){
+            if(err){
+              if(err == 'other'){
+                callback(null,token)
+              }else{
+                callback(err,token);
+              }
+            }else{
+              callback(null,token);
+            }
+          });
+        }
+      ],function(err,token){
         if(err){
           res.status(400).json({status:FAIL,result:err});
         }else{
-          res.status(200).json({status:SUCCESS,result:{token:data[0].token}});
+          res.status(200).json({status:SUCCESS,result:{token:token}});
         }
       });
     }else{
@@ -83,15 +83,31 @@ function API(){
     res.status(200).json({status:SUCCESS});
   };
 
-  this.withGmail = function(req,res){
-    var email = base64_decode(req.body.email);
-    var nama = base64_decode(req.body.name);
-    var password = generateToken.getPass();
+  this.logout = function(req,res){
+    let tok = req.headers.authorization;
+    let token = tok.substring(7,tok.length);
+    db.que('UPDATE akun SET regToken = "" WHERE token = ?',token,function(err,data){
+      if(err){
+        if(err=="other"){
+          res.status(200).json({status:SUCCESS});
+        }else{
+          res.status(400).json({status:FAIL});
+        }
+      }else{
+        res.status(200).json({status:SUCCESS});
+      }
+    });
+  }
 
+  this.withGmail = function(req,res){
+    let email = base64_decode(req.body.email);
+    let nama = base64_decode(req.body.name);
+    let password = generateToken.getPass();
+    let regToken = req.body.regToken;
     if(email && nama){
       async.waterfall([
         function(callback){
-          db.que('SELECT * FROM akun WHERE email = ?',email,function(err,data){
+          db.que('SELECT token FROM akun WHERE email = ?',email,function(err,data){
             if(err){
               if(err=='other'){
                 callback(null,true,null);
@@ -105,10 +121,10 @@ function API(){
         },
         function(insert,dataToken,callback){
           if(insert){
-            var tok = generateToken.getToken(email,password);
-            db.que('INSERT INTO akun (email,nama,kata_sandi,token) VALUES (?,?,?,?)',[email,nama,password,tok],function(err,data){
+            let tok = generateToken.getToken(email,password);
+            db.que('INSERT INTO akun (email,nama,kata_sandi,token,regToken) VALUES (?,?,?,?,?)',[email,nama,password,tok,regToken],function(err,data){
               if(err){
-                if(data.affectedRows > 0){
+                if(err == 'other'){
                   callback(null,SUCCESS,tok);
                 }else{
                   callback(err,null,null);
@@ -134,9 +150,9 @@ function API(){
   };
 
   this.updateDevice = function(req,res){
-    var id = req.body.id;
-    var job = req.body.job;
-    var sql = null;
+    let id = req.body.id;
+    let job = req.body.job;
+    let sql = null;
     if(id && job){
       switch (job) {
         case "angkat":
@@ -155,14 +171,14 @@ function API(){
           sql = "auto = 'Manual'";
           break;
         case "Otomatis":
-          sql = "auto = 'Otomatis'";
+          sql = "auto = 'Otomatis', servo = 'Angkat'";
           break;
       }
 
       if(sql){
-        db.que("UPDATE device SET "+sql+"WHERE device_id = ?",id,function(err,data){
+        db.que("UPDATE device SET "+sql+" WHERE device_id = ?",id,function(err,data){
           if(err){
-            if(data.affectedRows == 1){
+            if(err == 'other'){
               res.status(200).json({status:SUCCESS});
             }else{
               res.status(400).json({status:FAIL,result:err});
@@ -180,18 +196,18 @@ function API(){
   };
 
   this.signUp = function(req,res){
-    var email = base64_decode(req.body.email);
-    var nama = base64_decode(req.body.name);
-    var password = hashToSHA1(base64_decode(req.body.password));
+    let email = base64_decode(req.body.email);
+    let nama = base64_decode(req.body.name);
+    let password = hashToSHA1(base64_decode(req.body.password));
     if(email && nama && password){
-      var tok = generateToken.getToken(email,password);
+      let tok = generateToken.getToken(email,base64_decode(req.body.password));
       db.que('INSERT INTO akun (email,nama,kata_sandi,token) VALUES (?,?,?,?)',[email,nama,password,tok],function(err,data){
+        if(err == 'other'){
+          res.status(200).json({status:SUCCESS});
+        }else{
+          res.status(400).json({status:FAIL,result:err});
+        }
         if(err){
-          if(data.affectedRows > 0){
-            res.status(200).json({status:SUCCESS});
-          }else{
-            res.status(400).json({status:FAIL,result:err});
-          }
         }else{
           res.status(200).json({status:SUCCESS});
         }
@@ -201,12 +217,133 @@ function API(){
     }
   };
 
-  this.profile = function(req,res){
-    var tok = req.headers.authorization;
-    var tokimay = tok.substring(7,tok.length);
+  this.jemuranGet = function(req,res){
+    let tok = req.headers.authorization;
+    let token = tok.substring(7,tok.length);
     async.waterfall([
       function(callback){
-        db.que('SELECT * FROM akun WHERE token = ?',tokimay,function(err,data){
+        db.que('SELECT email FROM akun WHERE token = ?',token,function(err,data){
+          if(err){
+            callback(err,null);
+          }else{
+            callback(err,data[0].email);
+          }
+        });
+      },
+      function(email,callback){
+        db.que('SELECT *,DATE_ADD(tanggal_jemur, INTERVAL estimasi_waktu SECOND) AS tgl_selesai FROM jemur WHERE email = ?',email,function(err,data){
+          if(err){
+            callback(err,null);
+          }else{
+            callback(null,data);
+          }
+        });
+      }
+    ],function(err,data){
+      if(err){
+        res.status(400).json({status:FAIL,result:err});
+      }else{
+        res.status(200).json({status:SUCCESS,result:data});
+      }
+    });
+  };
+
+  this.jemuranUpdate = function(req,res){
+    let id_jemuran = req.body.id;
+    db.que("UPDATE jemur SET status = 'sudah kering' WHERE id_jemuran = ?",id_jemuran,function(err,data){
+      if(err){
+        if(err=="other"){
+          res.status(200).json({status:SUCCESS});
+        }else{
+          res.status(400).json({status:FAIL});
+        }
+      }else{
+        res.status(200).json({status:SUCCESS});
+      }
+    });
+  };
+
+  this.jemuranPost = function(req,res){
+    let tok = req.headers.authorization;
+    let token = tok.substring(7,tok.length);
+    let date = new Date(req.body.date);
+    let tgl_jemur = dateFormat(date,"yyyy-mm-dd'T'HH:MM:ss'Z'");
+    let timeNumber = 3600*2;
+    let timeString = parseInt(timeNumber,10);
+    let id_device = req.body.id;
+    let id_jemuran = dateFormat(date,"yyyymmddHHMMss");
+    if(date && id_device){
+      async.waterfall([
+        function(callback){
+          db.que("SELECT email FROM akun WHERE token = ?",token,function(err,data){
+            if(err){
+              callback(err,null);
+            }else{
+              callback(null,data[0].email);
+            }
+          });
+        },
+		function (email,callback) {
+			db.que('SELECT cahaya,hujan,lembab FROM device WHERE device_id = ?',id_device,function (err, data) {
+				if(err){
+					if(err == 'other'){
+						callback("device not found",null);
+					}else {
+						callback(err,null);
+					}
+				}else {
+					callback(null,data,email);
+				}
+			})
+		},
+        function(dataDevice,email,callback){
+          db.que("INSERT INTO jemur (id_jemuran,device_id,tanggal_jemur,estimasi_waktu,cahaya,hujan,lembab,email) VALUES (?,?,?,?,?,?,?,?)",[id_jemuran,id_device,tgl_jemur,timeString,dataDevice[0].cahaya,dataDevice[0].hujan,dataDevice[0].lembab,email],function(err,data){
+            if(err){
+              if(err == 'other'){
+                callback(null);
+              }else{
+                callback(err);
+              }
+            }else{
+              callback(null);
+            }
+          });
+        }
+      ],function(err){
+        if(err){
+			res.status(400).json({status:FAIL,result:err});
+        }else{
+          res.status(200).json({status:SUCCESS});
+        }
+      });
+    }else{
+      res.status(400).json({status:FAIL,result:'params not found'});
+    }
+  };
+
+  this.profileUpdate = function(req,res){
+    let tok = req.headers.authorization;
+    let token = tok.substring(7,tok.length);
+    let regToken = req.body.regToken;
+    db.que('UPDATE akun set regToken = ? WHERE token = ?',[regToken,token],function(err,data){
+      if(err){
+        if(err == 'other'){
+          res.status(200).json({status:SUCCESS});
+        }else{
+          res.status(400).json({status:FAIL,result:err});
+        }
+      }else{
+        res.status(200).json({status:SUCCESS});
+      }
+    });
+  };
+
+  this.profile = function(req,res){
+    let tok = req.headers.authorization;
+    let token = tok.substring(7,tok.length);
+    async.waterfall([
+      function(callback){
+        db.que('SELECT email,nama FROM akun WHERE token = ?',token,function(err,data){
           if(err){
             callback(err,null);
           }else{
@@ -217,17 +354,34 @@ function API(){
       function(dataUser,callback){
         db.que('SELECT * FROM device WHERE email = ?',dataUser.email,function(err,data){
           if(err){
-            callback(err,null,null);
+            if(err=="other"){
+              callback(null,dataUser,null);
+            }else{
+              callback(err,null,null);
+            }
           }else{
             callback(null,dataUser,data);
           }
         });
+      },
+      function(dataUser,dataDevice,callback){
+        db.que('SELECT * FROM jemur WHERE email = ?',dataUser.email,function(err,data){
+          if(err){
+            if(err=="other"){
+              callback(null,dataUser,dataDevice,null);
+            }else{
+              callback(err,null,null,null);
+            }
+          }else{
+            callback(null,dataUser,dataDevice,data);
+          }
+        });
       }
-    ],function(err,resultUser,resultDevice){
+    ],function(err,resultUser,resultDevice,resultRiwayat){
       if(err){
         res.status(400).json({status:FAIL,result:err});
       }else{
-        res.status(200).json({status:SUCCESS,result:{profile:resultUser,devices:resultDevice}});
+        res.status(200).json({status:SUCCESS,result:{profile:resultUser,devices:resultDevice,riwayat:resultRiwayat}});
       }
     });
   };
