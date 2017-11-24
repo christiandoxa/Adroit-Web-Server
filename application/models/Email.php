@@ -350,7 +350,7 @@ bgcolor="#ffffff">
         ';
 
         $sender_email = 'customeradroit@gmail.com';
-        $user_password = '@Adroitisthebest1#!';
+        $user_password = '@AdroitIsTheBest1#!';
         $receiver_email = $email;
         $subject = 'Selamat Datang Di Adroit Apps Service!';
         $message = $isi_email;

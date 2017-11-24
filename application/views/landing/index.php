@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="icon" href="<?php echo base_url('assets/main/') ?>images/favicon.png">
 
     <!-- Fonts -->
     <!-- Lato -->
