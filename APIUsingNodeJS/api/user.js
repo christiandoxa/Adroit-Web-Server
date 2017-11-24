@@ -4,6 +4,7 @@ var generateToken = require("../database/GenerateToken");
 var async = require('async');
 var dateFormat = require('dateformat');
 var cron = require('../api/cron');
+var request = require('request');
 var base64_encode = function(val){
   var encode = null;
   if(val){
@@ -17,7 +18,7 @@ var base64_decode = function(val){
     decode = new Buffer(val,'base64').toString('ascii');
   }
   return decode;
-}
+};
 const SUCCESS = true;
 const FAIL = false;
 
@@ -97,7 +98,7 @@ function API(){
         res.status(200).json({status:SUCCESS});
       }
     });
-  }
+  };
 
   this.withGmail = function(req,res){
     let email = base64_decode(req.body.email);
@@ -153,19 +154,27 @@ function API(){
     let id = req.body.id;
     let job = req.body.job;
     let sql = null;
+	  let servoMove = false;
+	  let servoMoveDirection = "";
     if(id && job){
       switch (job) {
         case "angkat":
           sql = "servo = 'Angkat'";
+			servoMove = true;
+			servoMoveDirection = "1";
           break;
         case "jemur":
           sql = "servo = 'Jemur'";
+			servoMove = true;
+			servoMoveDirection = "13";
           break;
         case "On":
           sql = "status = 'On'";
           break;
         case "Off":
           sql = "status = 'Off', servo = 'Angkat', auto = 'Manual'";
+			servoMove = true;
+			servoMoveDirection = "1";
           break;
         case "Manual":
           sql = "auto = 'Manual'";
@@ -176,17 +185,79 @@ function API(){
       }
 
       if(sql){
-        db.que("UPDATE device SET "+sql+" WHERE device_id = ?",id,function(err,data){
-          if(err){
-            if(err == 'other'){
-              res.status(200).json({status:SUCCESS});
-            }else{
-              res.status(400).json({status:FAIL,result:err});
-            }
-          }else{
-            res.status(200).json({status:SUCCESS});
-          }
-        });
+		  if (servoMove) {
+			  let option = {
+				  url: 'http://api.arkademy.com:3000/v0/arkana/device/IO/' + id + '/status',
+				  headers: {
+					  'Authorization': 'Bearer NDk0NjY4NzE2NC4zNzYwMjQ6'
+				  }
+			  };
+			  request(option, function (error, response, body) {
+				  if (!error && response.statusCode == 200) {
+					  let bodyJSON = JSON.parse(body);
+					  if (bodyJSON.result == "device is online") {
+						  let optionServo = {
+							  url: "http://api.arkademy.com:3000/v0/arkana/device/IO/" + id + "/pwm/control",
+							  method: "POST",
+							  headers: {
+								  "Authorization": "Bearer NDk0NjY4NzE2NC4zNzYwMjQ6"
+							  },
+							  json: {
+								  "controls": {
+									  "4": servoMoveDirection,
+									  "frequency": "50"
+								  }
+							  }
+						  };
+						  request(optionServo, function (error, response, body) {
+							  if (!error && response.statusCode == 200) {
+								  db.que("UPDATE device SET " + sql + " WHERE device_id = ?", id, function (err, data) {
+									  if (err) {
+										  if (err == 'other') {
+											  res.status(200).json({status: SUCCESS});
+										  } else {
+											  res.status(400).json({status: FAIL, result: err});
+										  }
+									  } else {
+										  res.status(200).json({status: SUCCESS});
+									  }
+								  });
+							  } else {
+								  console.log(error);
+								  res.status(500).json({status: FAIL, result: error});
+							  }
+						  })
+					  } else {
+						  db.que('UPDATE device SET status = "Off", servo = "Angkat", auto = "Manual" WHERE device_id = ?', id, function (err, data) {
+							  if (err) {
+								  if (err == 'other') {
+									  res.status(400).json({status: FAIL, result: "Device must be online"});
+								  } else {
+									  res.status(500).json({status: FAIL, result: err});
+								  }
+							  } else {
+								  res.status(400).json({status: FAIL, result: "Device must be online"});
+							  }
+						  });
+					  }
+				  } else {
+					  console.log(error);
+					  res.status(500).json({status: FAIL, result: error});
+				  }
+			  })
+		  } else {
+			  db.que("UPDATE device SET " + sql + " WHERE device_id = ?", id, function (err, data) {
+				  if (err) {
+					  if (err == 'other') {
+						  res.status(200).json({status: SUCCESS});
+					  } else {
+						  res.status(400).json({status: FAIL, result: err});
+					  }
+				  } else {
+					  res.status(200).json({status: SUCCESS});
+				  }
+			  });
+		  }
       }else{
         res.status(400).json({status:FAIL,result:'params not found'});
       }

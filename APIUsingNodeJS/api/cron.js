@@ -1,6 +1,8 @@
 
 var cron = require('node-cron');
 var job = null;
+var sensor = null;
+var request = require('request');
 var dateFormat = require('dateformat');
 var async = require('async');
 var admin = require("firebase-admin");
@@ -94,7 +96,200 @@ function Cron(){
       	}
       });
     });
-  }
-};
+	  sensor = cron.schedule("*/5 * * * * *", function () {
+		  async.waterfall([
+			  function (callback) {
+				  db.que('SELECT device_id FROM device WHERE status = "On"', null, function (err, data) {
+					  if (err) {
+						  callback(err, null);
+					  } else {
+						  let deviceIds = [];
+						  for (let i = 0; i <= data.length; i++) {
+							  if (i < data.length) {
+								  deviceIds.push(data[i].device_id);
+							  } else {
+								  callback(null, deviceIds);
+							  }
+						  }
+					  }
+				  })
+			  },
+			  function (deviceIds, callback) {
+				  let i = 0;
+				  let idDeviceOnline = [];
+				  let errAray = [];
+
+				  function getDeviceStatus() {
+					  if (i < deviceIds.length) {
+						  let option = {
+							  url: 'http://api.arkademy.com:3000/v0/arkana/device/IO/' + deviceIds[i] + '/status',
+							  headers: {
+								  'Authorization': 'Bearer NDk0NjY4NzE2NC4zNzYwMjQ6'
+							  }
+						  };
+						  request(option, function (error, response, body) {
+							  if (!error && response.statusCode == 200) {
+								  let bodyJSON = JSON.parse(body);
+								  if (bodyJSON.result == "device is online") {
+									  idDeviceOnline.push(bodyJSON.device_id);
+									  i++;
+									  getDeviceStatus();
+								  } else {
+									  db.que('UPDATE device SET status = "Off", servo = "Angkat", auto = "Manual" WHERE device_id = ?', deviceIds[i], function (err, data) {
+										  if (err) {
+											  if (err == 'other') {
+												  i++;
+												  getDeviceStatus();
+											  } else {
+												  errAray.push(err);
+											  }
+										  } else {
+											  i++;
+											  getDeviceStatus();
+										  }
+									  });
+									  i++;
+									  getDeviceStatus();
+								  }
+							  } else {
+								  console.log(error);
+								  i++;
+								  getDeviceStatus();
+							  }
+						  })
+					  } else {
+						  if (errAray.length > 0) {
+							  console.log(errAray);
+						  }
+						  if (idDeviceOnline.length > 0) {
+							  callback(null, deviceIds);
+						  } else {
+							  callback("No Device Online", null);
+						  }
+					  }
+				  }
+
+				  getDeviceStatus();
+			  },
+			  function (deviceIds, callback) {
+				  async.parallel([
+					  function (callback) {
+						  for (let i = 0; i <= deviceIds.length; i++) {
+							  if (i < deviceIds.length) {
+								  let option = {
+									  url: 'http://api.arkademy.com:3000/v0/arkana/device/IO/' + deviceIds[i] + '/adc/data',
+									  headers: {
+										  'Authorization': 'Bearer NDk0NjY4NzE2NC4zNzYwMjQ6'
+									  }
+								  };
+								  request(option, function (error, response, body) {
+									  if (!error && response.statusCode == 200) {
+										  let bodyJSON = JSON.parse(body);
+										  if (bodyJSON.status == true && bodyJSON.data.status != null) {
+											  let cahaya = parseInt(parseFloat(bodyJSON.data.result["0"]) * 10000);
+											  console.log(cahaya);
+											  db.que('UPDATE device SET cahaya = ? WHERE device_id = ?', [cahaya, deviceIds[i]], function (err, data) {
+												  if (err) {
+													  if (err != 'other') {
+														  callback(err);
+													  } else {
+														  callback(null);
+													  }
+												  } else {
+													  callback(null);
+												  }
+											  })
+										  }
+									  } else {
+										  callback(error);
+									  }
+								  })
+							  }
+						  }
+					  },
+					  function (callback) {
+						  console.log(deviceIds);
+						  for (let i = 0; i <= deviceIds.length; i++) {
+							  if (i < deviceIds.length) {
+								  let option = {
+									  url: 'http://api.arkademy.com:3000/v0/arkana/device/IO/' + deviceIds[i] + '/dht11/data',
+									  headers: {
+										  'Authorization': 'Bearer NDk0NjY4NzE2NC4zNzYwMjQ6'
+									  }
+								  };
+								  request(option, function (error, response, body) {
+									  if (!error && response.statusCode == 200) {
+										  let bodyJSON = JSON.parse(body);
+										  if (bodyJSON.status == true && bodyJSON.data.status == "OK") {
+											  console.log(bodyJSON.data.result["humidity"]);
+											  db.que('UPDATE device SET lembab = ? WHERE device_id = ?', [bodyJSON.data.result["humidity"], deviceIds[i]], function (err, data) {
+												  if (err) {
+													  if (err != 'other') {
+														  callback(err);
+													  } else {
+														  callback(null);
+													  }
+												  } else {
+													  callback(null);
+												  }
+											  })
+										  }
+									  } else {
+										  callback(error);
+									  }
+								  })
+							  }
+						  }
+					  }/*,
+					function (callback) {
+						for(let i = 0; i <= deviceIds; i++){
+							if(i < deviceIds){
+								let option = {
+									url: 'http://api.arkademy.com:3000/v0/arkana/device/IO/'+deviceIds[i]+'/gpio/data',
+									headers:{
+										'Authorization': 'Bearer NDk0NjY4NzE2NC4zNzYwMjQ6'
+									}
+								};
+								request(option,function (error, response, body) {
+									if(!error && response.statusCode == 200){
+										let body = JSON.parse(body);
+										if(body.status == true && body.data.status != null){
+											db.que('UPDATE device SET hujan = ? WHERE device_id = ?',[body.data.result["4"],deviceIds[i]],function (err, data) {
+												if(err){
+													if(err != 'other'){
+														callback(err);
+														break;
+													}else {
+														callback(null);
+													}
+												}else {
+													callback(null);
+												}
+											})
+										}
+									}else {
+										callback(error);
+									}
+								})
+							}
+						}
+					}*/
+				  ], function (err) {
+					  if (err) {
+						  console.log(err);
+						  callback(err);
+					  } else {
+						  callback(null);
+					  }
+				  })
+			  }
+		  ], function (err) {
+			  if (err) {
+				  console.log(err);
+			  }
+		  })
+	  })
+  };
+}
 
 module.exports = new Cron();
