@@ -187,25 +187,25 @@ function API(){
       if(sql){
 		  if (servoMove) {
 			  let option = {
-				  url: 'http://api.arkademy.com:3000/v0/arkana/device/IO/' + id + '/status',
+				  url: 'https://api.arkademy.com:8443/v0/arkana/device/IO/' + id + '/status',
 				  headers: {
-					  'Authorization': 'Bearer NDk0NjY4NzE2NC4zNzYwMjQ6'
+					  'Authorization': 'Bearer MTgwNjg2MjI5MC4zODI3NDE1Og=='
 				  }
 			  };
-			  request(option, function (error, response, body) {
-				  if (!error && response.statusCode == 200) {
+			  request(option, function (error, respone, body) {
+				  if (!error && respone.statusCode == 200) {
 					  let bodyJSON = JSON.parse(body);
 					  if (bodyJSON.result == "device is online") {
 						  let optionServo = {
-							  url: "http://api.arkademy.com:3000/v0/arkana/device/IO/" + id + "/pwm/control",
+							  url: "https://api.arkademy.com:8443/v0/arkana/device/IO/" + id + "/pwm/control",
 							  method: "POST",
 							  headers: {
-								  "Authorization": "Bearer NDk0NjY4NzE2NC4zNzYwMjQ6"
+								  "Authorization": "Bearer MTgwNjg2MjI5MC4zODI3NDE1Og=="
 							  },
 							  json: {
 								  "controls": {
 									  "4": servoMoveDirection,
-									  "frequency": "50"
+									  "frequency": "20"
 								  }
 							  }
 						  };
@@ -217,6 +217,7 @@ function API(){
 											  res.status(200).json({status: SUCCESS});
 										  } else {
 											  res.status(400).json({status: FAIL, result: err});
+											  console.log(err);
 										  }
 									  } else {
 										  res.status(200).json({status: SUCCESS});
@@ -244,7 +245,7 @@ function API(){
 					  console.log(error);
 					  res.status(500).json({status: FAIL, result: error});
 				  }
-			  })
+			  });
 		  } else {
 			  db.que("UPDATE device SET " + sql + " WHERE device_id = ?", id, function (err, data) {
 				  if (err) {
